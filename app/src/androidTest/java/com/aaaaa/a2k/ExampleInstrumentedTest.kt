@@ -1,4 +1,4 @@
-package com.jsn.a20k
+package com.aaaaa.a2k
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

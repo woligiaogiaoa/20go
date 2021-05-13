@@ -1,8 +1,9 @@
-package com.jsn.a20k
+package com.aaaaa.a2k
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentUris
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -12,11 +13,13 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentResolverCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
+import com.aaaaa.a2k.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -29,11 +32,10 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        val binding:ActivityMainBinding=DataBindingUtil.setContentView(this,R.layout.activity_main)
 
 
-        // Example of a call to a native method
-        findViewById<TextView>(R.id.sample_text).text = stringFromJNI()
         requestPermissions(
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE),
                 code)
@@ -41,32 +43,46 @@ class MainActivity : AppCompatActivity() {
         val TAG="VIDEOS"
 
         var index=1
+        var index1=1
 
         videos.observeForever {
-            synchronized(lock){
-                it.forEach { video ->
-                    Log.e(TAG + "${index++}", video.toString())
+            synchronized(lock) {
+
+                //findViewById<EpoxyRecyclerView>(R.id.rv).layoutManager= LinearLayoutManager(this)
+
+                binding.rv.withModels {
+                    it.forEach { video ->
+                        video {
+                            id(index++)
+                            click {  v ->
+                                val name=getVideoFormatName(video.data).also {
+                                    Log.e(
+                                        TAG,
+                                        "video format${it}",
+
+                                    ) }
+                                showToast(name)
+                            }
+                            videoInfo(video)
+                        }
+                        Log.e(TAG + "${index++}", video.toString())
+                    }
                 }
             }
+
         }
     }
 
-    private fun testAllFiles() {
-        //运行设备>=Android 11.0
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            //检查是否已经有权限
-            if (!Environment.isExternalStorageManager()) {
-                //跳转新页面申请权限
-                startActivityForResult(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION), 438)
-            }
-        }
-    }
+    fun Context.showToast(data:String)=Toast.makeText(this,data,Toast.LENGTH_SHORT).show()
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String
+
+
+    external fun getVideoFormatName(path:String):String
 
     @SuppressLint("NewApi")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -92,6 +108,9 @@ class MainActivity : AppCompatActivity() {
                         if (!Environment.isExternalStorageManager()) {
                             //跳转新页面申请权限
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION), 438)
+                        }
+                        else{
+                            getVideos()
                         }
                     }
                     else{

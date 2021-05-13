@@ -4,22 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="videoInfo"
+            type="com.aaaaa.a2k.MainActivity.Video" />
 
+        <variable
+            name="click"
+            type="android.view.View.OnClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        android:layout_height="wrap_content">
 
-        <com.airbnb.epoxy.EpoxyRecyclerView
-            android:id="@+id/rv"
+        <TextView
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:onClick="@{click}"
+            android:text="@{videoInfo.toString()}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

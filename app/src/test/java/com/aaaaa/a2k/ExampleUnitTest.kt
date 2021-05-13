@@ -1,4 +1,4 @@
-package com.jsn.a20k
+package com.aaaaa.a2k
 
 import org.junit.Test
 
