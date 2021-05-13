@@ -3,6 +3,8 @@
 
 #include "android/bitmap.h"
 
+#include <memory>
+
 extern "C"{
 
 #include "libavcodec/avcodec.h"
@@ -24,22 +26,25 @@ Java_com_aaaaa_a2k_MainActivity_getVideoFormatName(JNIEnv *env, jobject thiz, js
 
     AVFormatContext *avFormatContext= nullptr;
 
-    const char *nativeString = env->GetStringUTFChars(path, 0);
+    const char * nativeString=env->GetStringUTFChars(path, 0);
+    {
+        jstring formatName;
 
-    //Do something with the nativeString
+        if(avformat_open_input( &avFormatContext,nativeString, nullptr, nullptr)){
 
-    if(avformat_open_input( &avFormatContext,nativeString, nullptr, nullptr)){
+            std::string empty;
+            formatName=env->NewStringUTF(empty.c_str());
+
+        } else{
+            auto name = avFormatContext->iformat->long_name;
+            formatName=env->NewStringUTF(name);
+
+        }
+
         env->ReleaseStringUTFChars(path, nativeString);
-        std::string empty;
-        return env->NewStringUTF(empty.c_str());
 
+        return formatName;
     }
-
-    auto name = avFormatContext->iformat->long_name;
-
-    env->ReleaseStringUTFChars(path, nativeString);
-    return env->NewStringUTF(name);
-
 
 }
 

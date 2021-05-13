@@ -192,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         // Show only videos that are at least 5 minutes in duration.
         val selection = "${MediaStore.Video.Media.DURATION} >= ?"
         val selectionArgs = arrayOf(
-                java.util.concurrent.TimeUnit.MILLISECONDS.convert(5, java.util.concurrent.TimeUnit.MINUTES).toString()
+                java.util.concurrent.TimeUnit.MILLISECONDS.convert(5, java.util.concurrent.TimeUnit.SECONDS).toString()
         )
 
         // Display videos in alphabetical order based on their display name.
