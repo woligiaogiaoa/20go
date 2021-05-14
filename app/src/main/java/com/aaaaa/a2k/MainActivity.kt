@@ -6,6 +6,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,16 +14,19 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentResolverCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
+import com.aaaaa.a2k.ScreenShot.saveImageToGallery
 import com.aaaaa.a2k.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainActivity : AppCompatActivity() {
@@ -59,9 +63,21 @@ class MainActivity : AppCompatActivity() {
                                     Log.e(
                                         TAG,
                                         "video format${it}",
-
                                     ) }
+
                                 showToast(name)
+
+                                GlobalScope.launch((Dispatchers.Default)) {
+
+                                    val bitmap= Bitmap.createBitmap(300,300,Bitmap.Config.ARGB_8888)
+                                    if(showVideoPreview(video.data, bitmap))
+                                    withContext(Dispatchers.Main){
+                                            binding.iv.setImageBitmap(bitmap).also {
+                                                Log.e(TAG, "fuckckckck${bitmap}", )
+                                                saveImageToGallery(this@MainActivity,bitmap);
+                                            }
+                                    }
+                                }
                             }
                             videoInfo(video)
                         }
@@ -83,6 +99,9 @@ class MainActivity : AppCompatActivity() {
 
 
     external fun getVideoFormatName(path:String):String
+
+
+    external fun showVideoPreview(path:String,bitmap: Bitmap):Boolean
 
     @SuppressLint("NewApi")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
