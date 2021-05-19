@@ -49,12 +49,23 @@ class MainActivity : AppCompatActivity() {
         var index=1
         var index1=1
 
+        val lock=Any()
+
         videos.observeForever {
             synchronized(lock) {
 
                 //findViewById<EpoxyRecyclerView>(R.id.rv).layoutManager= LinearLayoutManager(this)
 
                 binding.rv.withModels {
+
+                    testdb {
+                        id("testdb")
+                        click {  _ ->
+                            //todo :test db
+
+                        }
+                    }
+
                     it.forEach { video ->
                         video {
                             id(index++)
@@ -85,7 +96,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
         }
     }
 
@@ -155,7 +165,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    val lock =Any()
 
     companion object {
         // Used to load the 'native-lib' library on application startup.
@@ -257,5 +266,147 @@ class MainActivity : AppCompatActivity() {
             videos.postValue((videoList))
         }
     }
+
+}
+
+class Solutions {
+    fun search(nums: IntArray, target: Int): Int {
+
+        var start = 0;
+        var end = nums.size - 1;
+
+        if (target > nums[end] || target < nums[start]) return -1;
+
+        while (start != end) {
+            /* if(start+1==end){
+                return if(nums[start]==target) start else if(nums[end]==target) end else -1
+            }*/
+            val splitIndex = (end + start) / 2
+
+            if (nums[splitIndex] == target) return splitIndex
+
+            if (nums[splitIndex] > target) {
+                end = splitIndex - 1
+            } else {
+                start = splitIndex + 1
+            }
+
+
+        }
+        return if (target == nums[start]) start else -1
+    }
+
+   // 3
+
+    //1 2 3 3 3 3 1 2 3 2 1 3 2 1 3
+
+    fun removeElements(nums: IntArray, `val`: Int): Int {
+
+        var  idle=-1
+        repeat(nums.size){ index ->
+            if(nums[index]!=`val`){
+                nums[++idle]=nums[index]
+            }
+        }
+        return idle+1
+    }
+
+    fun minSubArrayLen(target: Int, nums: IntArray): Int {
+
+        var find=false
+        var minLength=Int.MAX_VALUE
+        repeat(nums.size){ startIndex ->
+
+            var sum=0
+            for ( i in startIndex..nums.size-1){
+                sum +=nums[i]
+                if(sum>=target){
+                    val res=i-startIndex+1
+                    minLength= kotlin.math.min(minLength,res)
+                    find=true
+                    break
+                }
+            }
+        }
+
+        return if(!find) 0 else{
+            minLength
+        }
+    }
+
+/*
+    fun search1(nums: IntArray, target: Int): Int {
+
+        //qweasdasdasa
+        //qwesada
+
+        //return searchRange1(nums,0,nums.size-1,target)
+        return 0
+    }
+
+    fun searchRange1(nums:IntArray,start:Int,end:Int,target: Int):Int{
+
+        if(target>nums[end] || target<nums[start]) return -1;
+
+        if(start==end && nums[start]==target) return  start
+
+        if(start+1==end){
+            return if(nums[start]==target) start else if(nums[end]==target) end else -1
+        }
+
+        val splitIndex = (end-start+1)/2
+
+        if(nums[splitIndex]==target) return  splitIndex
+
+
+        if(nums[splitIndex]>target){
+            val newEnd=splitIndex-1
+            return searchRange1(nums,start,newEnd,target)
+        } else{
+            return searchRange1(nums,splitIndex+1,end,target)
+        }
+
+    }*/
+
+
+        //[-1,0,3,5,9,12] size:6
+        //9
+
+        // no repeat valid data set
+        /* fun search2(nums: IntArray, target: Int): Int {
+        if(target<nums[0] || target>nums[nums.size-1]) return  -1
+
+        if(nums.size==1 && target==nums[0]) return 0
+
+        if(nums.size==2){
+            return if(nums[0]==target) 0 else if(nums[1]==target) 1 else -1
+        }
+
+        //nums>3
+        val splitIndex=nums.size/2
+
+        if(nums[splitIndex]==target) return splitIndex
+
+        if(nums[splitIndex]>target){
+            return search(mutableListOf<Int>().run {
+                 repeat(splitIndex){ index ->
+                     add(nums[index])
+                 }
+                 toIntArray()
+            },target)
+        }
+        else{
+            return search(mutableListOf<Int>().run {
+                for(i in splitIndex..nums.size-1){
+                    add(nums[i])
+                }
+                toIntArray()
+            },target)
+        }
+    }
+*/
+
+        //[-1,0,3,5,9,12] size:6
+        //9
 
 }
