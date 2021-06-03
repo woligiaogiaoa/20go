@@ -37,7 +37,7 @@ Java_com_aaaaa_a2k_MainActivity_getVideoFormatName(JNIEnv *env, jobject thiz, js
             formatName = env->NewStringUTF(empty.c_str());
 
         } else {
-            auto name = avFormatContext->iformat->long_name;
+            auto name = avFormatContext->iformat->name;
             formatName = env->NewStringUTF(name);
 
         }
@@ -113,7 +113,7 @@ Java_com_aaaaa_a2k_MainActivity_showVideoPreview(JNIEnv *env, jobject thiz, jstr
 
 
     SwsContext *scaleContext(sws_getContext(
-            codecParameters->width,
+                codecParameters->width,
             codecParameters->height,
             videoCodecContext->pix_fmt,
             bitmapInfo.width,

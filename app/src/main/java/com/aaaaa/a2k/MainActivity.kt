@@ -8,13 +8,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
+import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -23,10 +20,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import com.aaaaa.a2k.ScreenShot.saveImageToGallery
 import com.aaaaa.a2k.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import java.lang.Runnable
 
 
 class MainActivity : AppCompatActivity() {
@@ -41,7 +36,8 @@ class MainActivity : AppCompatActivity() {
 
 
         requestPermissions(
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE),
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.MANAGE_EXTERNAL_STORAGE),
                 code)
 
         val TAG="VIDEOS"
@@ -81,7 +77,9 @@ class MainActivity : AppCompatActivity() {
                                 GlobalScope.launch((Dispatchers.Default)) {
 
                                     val bitmap= Bitmap.createBitmap(300,300,Bitmap.Config.ARGB_8888)
-                                    if(showVideoPreview(video.data, bitmap))
+                                    if(showVideoPreview(video.data.also {
+                                                Log.e(TAG, "videoFileUrl${it}")
+                                            }, bitmap))
                                     withContext(Dispatchers.Main){
                                             binding.iv.setImageBitmap(bitmap).also {
                                                 Log.e(TAG, "fuckckckck${bitmap}", )
@@ -98,6 +96,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    val handler= Handler(Looper.getMainLooper())
 
     fun Context.showToast(data:String)=Toast.makeText(this,data,Toast.LENGTH_SHORT).show()
 
@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
                         if (!Environment.isExternalStorageManager()) {
                             //跳转新页面申请权限
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION), 438)
+                            //root previllage
                         }
                         else{
                             getVideos()
@@ -168,7 +169,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         // Used to load the 'native-lib' library on application startup.
-        init {
+        init    {
             // avutil avformat avcodec swscale avdevice avfilter swresample
             System.loadLibrary("native-lib")
             System.loadLibrary("avutil")
@@ -223,6 +224,7 @@ class MainActivity : AppCompatActivity() {
                 java.util.concurrent.TimeUnit.MILLISECONDS.convert(5, java.util.concurrent.TimeUnit.SECONDS).toString()
         )
 
+
         // Display videos in alphabetical order based on their display name.
         val sortOrder = "${MediaStore.Video.Media.DISPLAY_NAME} ASC"
 
@@ -269,6 +271,275 @@ class MainActivity : AppCompatActivity() {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
+fun isAnagram(s: String, t: String): Boolean {
+
+    if(s.length!=t.length) return false
+    val map= mutableMapOf<Char,Int>()
+    s.forEach {
+        var num=map.getOrDefault(it,0)
+        map[it]=++num
+    }
+    t.forEach {
+        var num=map.getOrDefault(it,0)
+        map[it]=--num
+        if(map[it]!!<=-1){
+            return false
+        }
+    }
+
+    return true
+}
+
+//2x +2 y = x+ y + n (y +z)
+//x + y =n(y+z)
+fun detectCycle(head: ListNode?): ListNode? {
+    var slow=head
+    var fast=head
+    while(slow?.next!=null && fast?.next!=null){
+        slow=slow.next
+        fast= fast.next!!.next
+        if(fast!=null && slow===fast){
+            var go=head
+            var go1 =fast
+            while(!(go===go1)){
+                go=go!!.next
+                go1=go1!!.next
+            }
+            return  go
+        }
+    }
+
+    return null
+}
+
+// 1 2 3 4      //  2 1 3
+fun swapPairs(head: ListNode?): ListNode? {
+
+    head ?: return head
+
+    var first: ListNode? =ListNode(-1)
+    var second: ListNode? =ListNode(-1)
+    first!!.next=second
+    second!!.next=head
+
+    var newHead: ListNode? =null
+
+    while(second!!.next!=null && second.next!!.next!=null){
+        first=second.next
+        second=second!!.next!!.next
+
+        val pairTailNext=second!!.next
+
+        second.next=first
+        first!!.next=pairTailNext
+
+        val newSecond=first
+        first=second
+        second=newSecond
+        if(newHead==null){
+            newHead=first
+        }
+    }
+    return if(newHead==null) head else newHead
+
+}
+
+
+fun reverseList(head: ListNode?): ListNode? {
+    var curr: ListNode? =head
+    var pre: ListNode? =null
+    while(curr!=null){
+        val next=curr.next
+        curr.next=pre
+        pre=curr
+        curr=next
+    }
+    return pre
+}
+
+
+
+//                   [1]        [1][3]      [1][2][3]
+//["MyLinkedList","addAtHead","addAtTail","addAtIndex","get","deleteAtIndex","get"]
+//[[],[1],[3],[1,2],[1],[1],[1]]
+
+//
+class MyLinkedList() {
+
+    /** Initialize your data structure here. */
+
+    var head: Node? = null
+
+    //var tail: Node? =head
+
+    var length = 0
+
+    class Node(var `val`: Int ,
+               var next: Node? = null)
+
+    /** Get the value of the index-th node in the linked list. If the index is invalid, return -1. */
+    fun get(index: Int): Int {
+        if (length == 0) return -1
+        if (index < 0 || index > length - 1) return -1
+
+        var iterator: Node? = head
+        repeat(index) {
+            iterator = iterator!!.next
+        }
+        return iterator!!.`val`
+    }
+
+    /** Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list. */
+    fun addAtHead(`val`: Int) {
+        val add = Node(`val`)
+        length++
+        if (length == 0) {
+            head = add
+        } else {
+            add.next = head
+            head = add
+        }
+    }
+
+    /** Append a node of value val to the last element of the linked list. */
+    fun addAtTail(`val`: Int) {
+        if (length == 0) {
+            addAtHead(`val`)
+        } else {
+            var tail = head
+            repeat(length - 1) {
+                tail = tail!!.next
+            }
+            Node(`val`).also {
+                tail!!.next = it
+            }
+            length++
+        }
+    }
+
+
+    //[1,3]
+    /** Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted. */
+    fun addAtIndex(index: Int, `val`: Int) {
+
+        //[0 ,length]
+        if (index > length) return
+
+
+        var targetIndex = -1
+        targetIndex = index
+        if (targetIndex < 0) targetIndex = 0
+
+        if (length == 0) {
+            addAtHead(`val`)
+            return
+        }
+
+
+        var ite: Node? = head
+        repeat(targetIndex) {
+            ite = ite!!.next
+        }
+
+        if (ite == null) {
+            addAtTail(`val`)
+            return
+        }
+
+
+        var itePre: Node? = head
+
+        if (targetIndex >= 1) {
+
+            val insert = Node(`val`).apply {
+                next = ite
+            }
+
+            repeat(targetIndex - 1) {
+                itePre = itePre!!.next
+            }
+            itePre!!.next = insert
+            length++
+
+        } else {
+            addAtHead(`val`)
+        }
+    }
+
+    /** Delete the index-th node in the linked list, if the index is valid. */
+    fun deleteAtIndex(index: Int) {
+        if (index < 0 || index >= length) {
+            return
+        }
+
+        var toDelete = head //to delete
+        repeat(index) {
+            toDelete = toDelete!!.next
+        }
+
+        var ite1 = head
+
+        if (index >= 1) {
+            repeat(index - 1) {
+                ite1 = ite1!!.next
+            }
+            ite1!!.next = toDelete!!.next
+
+        } else {
+            val new = toDelete!!.next
+            head = new
+
+        }
+        length--
+
+    }
+
+}
+
+/**
+ * Your MyLinkedList object will be instantiated and called as such:
+ * var obj = MyLinkedList()
+ * var param_1 = obj.get(index)
+ * obj.addAtHead(`val`)
+ * obj.addAtTail(`val`)
+ * obj.addAtIndex(index,`val`)
+ * obj.deleteAtIndex(index)
+ */
+
+
+class ListNode(var `val`: Int) {
+         var next: ListNode?=null
+     }
+
+fun removeElements(head: ListNode?, `val`: Int): ListNode? {
+
+    var virtualHead:ListNode?=ListNode(-1).apply {
+        next = head
+    }
+    val rememberVirtual: ListNode =virtualHead!!
+
+    while(virtualHead!!.next!=null){
+
+        var node: ListNode? =virtualHead.next!!    //1
+                                                   //2
+                                                   //3
+        node.also {                                //4
+            if(node!!.`val`==`val`){
+                val next: ListNode? =node!!.next
+                virtualHead!!.next=next
+                node=null
+            }
+            else{
+                virtualHead=virtualHead!!.next!!
+            }
+        }
+    }
+
+    return rememberVirtual.next
+
+}
+
 class Solutions {
     fun search(nums: IntArray, target: Int): Int {
 
@@ -296,11 +567,74 @@ class Solutions {
         return if (target == nums[start]) start else -1
     }
 
-   // 3
+    /**
+     * Example:
+     * var li = ListNode(5)
+     * var v = li.`val`
+     * Definition for singly-linked list.
+     * class ListNode(var `val`: Int) {
+     *     var next: ListNode? = null
+     * }
+     */
 
-    //1 2 3 3 3 3 1 2 3 2 1 3 2 1 3
 
-    fun removeElements(nums: IntArray, `val`: Int): Int {
+
+
+    fun generateMatrix(n: Int): Array<IntArray> {
+
+        val matrix =
+            mutableListOf<IntArray>().apply {
+                repeat(n) {
+                    add(mutableListOf<Int>().apply {
+                        repeat(n){
+                            add(0)
+                        }
+                    }.toIntArray())
+                }
+            }
+
+        var loop = n/2
+
+        if(n % 2 >0) loop++
+
+        var start=0
+
+        var data=1
+
+        while(loop -- > 0){
+            for(i in start..n-1-start){
+                //first loop
+                matrix[start][i]=data++
+
+            }
+
+            if(start <n-1-start)
+            for(i in start+1..n-1-start){
+                matrix[i][n-1-start]=data++
+            }
+
+            if(start <n-1-start)
+            for(i in n-1-start-1 downTo start step 1){
+                matrix[n-1-start][i]=data++
+            }
+
+            if(start <n-1-start-1)
+                for(i in n-1-start-1 downTo start+1 step 1){
+                    matrix[i][start]=data++
+                }
+            start++
+        }
+
+        return  mutableListOf<IntArray>().apply {
+            repeat(n){
+                add(matrix[it])
+            }
+        }.toTypedArray()
+
+
+    }
+
+    fun removeElements1(nums: IntArray, `val`: Int): Int {
 
         var  idle=-1
         repeat(nums.size){ index ->
@@ -311,7 +645,7 @@ class Solutions {
         return idle+1
     }
 
-    fun minSubArrayLen(target: Int, nums: IntArray): Int {
+    fun minSubArrayLen1(target: Int, nums: IntArray): Int {
 
         var find=false
         var minLength=Int.MAX_VALUE
@@ -332,6 +666,25 @@ class Solutions {
         return if(!find) 0 else{
             minLength
         }
+    }
+
+    fun minSubArrayLen(target: Int, nums: IntArray): Int {
+            var start=0
+            var end=0
+            var min=Int.MAX_VALUE
+            var sum=0
+            while(end <=nums.size-1){
+                sum+=nums[end]
+                while(sum>=target){
+                    val length= end-start+1
+                    min=kotlin.math.min(min,length)
+                    sum-=nums[start]
+                    start++
+                }
+                //finally
+                end++
+            }
+            return if(min== Int.MAX_VALUE) 0 else min
     }
 
 /*
