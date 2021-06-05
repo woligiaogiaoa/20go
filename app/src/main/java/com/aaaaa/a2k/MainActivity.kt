@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
             synchronized(lock) {
 
                 //findViewById<EpoxyRecyclerView>(R.id.rv).layoutManager= LinearLayoutManager(this)
-
                 binding.rv.withModels {
 
                     testdb {
@@ -271,6 +270,94 @@ class MainActivity : AppCompatActivity() {
 
 }
 
+fun threeSum(nums: IntArray): List<List<Int>> {
+    val valueIndexMap= mutableMapOf<Int,Int>()
+
+    var indexa=0
+    nums.forEach {
+        valueIndexMap.put(it,indexa++)
+    }
+    if(nums.size<3) return emptyList()
+
+    val indexSumMap= mutableMapOf<Pair<Int,Int>,Int>()
+
+    repeat(nums.size){ i ->
+        for(j in i +1..nums.size-1){
+            if(nums[i]!=nums[j])
+            indexSumMap[Pair(i,j)]=nums[i] +nums[j]
+        }
+    }
+
+    val res= mutableListOf<MutableList<Int>>()
+
+    for (mutableEntry in indexSumMap) {
+        val sum12 =mutableEntry.value
+        if(valueIndexMap.containsKey(-sum12)){
+
+            val index3 =valueIndexMap[-sum12]!!
+
+            if(index3!=mutableEntry.key.first && index3!=mutableEntry.key.second){
+                res.add(mutableListOf<Int>().apply {
+                    add(nums.get(index3))
+                    add(nums[mutableEntry.key.first])
+                    add(nums[mutableEntry.key.second])
+                })
+            }
+        }
+    }
+
+    return res
+
+
+}
+
+fun canConstruct(ransomNote: String, magazine: String): Boolean {
+
+
+    val datasMap=IntArray(26){0}
+
+    magazine.forEach {
+        val index=it-'a'
+        datasMap[index]++
+    }
+    ransomNote.forEach {
+        datasMap[it-'a']--
+        if(datasMap[it-'a']<0)
+            return false
+    }
+    return true
+}
+
+
+
+
+//digema
+fun intersection(nums1: IntArray, nums2: IntArray): IntArray {
+
+    if(nums1.size==0 || nums2.size==0)
+        return emptyArray<Int>().toIntArray()
+
+    val set1= mutableSetOf<Int>()
+    val set2= mutableSetOf<Int>()
+
+    nums1.forEach {
+        set1.add(it)
+    }
+    nums2.forEach {
+        if(set1.contains(it))
+        set2.add(it)
+    }
+
+    val res = arrayListOf<Int>()
+
+    var index=0
+    set2.forEach {
+        res.add(index++,it)
+    }
+
+    return  res.toIntArray()
+}
+
 @RequiresApi(Build.VERSION_CODES.N)
 fun isAnagram(s: String, t: String): Boolean {
 
@@ -358,6 +445,39 @@ fun reverseList(head: ListNode?): ListNode? {
     return pre
 }
 
+
+fun fourSumCount(nums1: IntArray, nums2: IntArray, nums3: IntArray, nums4: IntArray): Int {
+
+    val sum12times= mutableMapOf<Int,Int>()
+    val sum34times= mutableMapOf<Int,Int>()
+
+    var num=0
+
+
+    nums1.forEach {  a ->
+        nums2.forEach {  b ->
+            if(sum12times[a+b]==null)
+                sum12times[a+b]=0
+           sum12times[a+b] = sum12times[a+b]!! + 1
+        }
+    }
+
+    nums3.forEach {  a ->
+        nums4.forEach {  b ->
+            if(sum34times[a+b]==null)
+                sum34times[a+b]=0
+            sum34times[a+b] = sum34times[a+b]!! + 1
+        }
+    }
+
+    for (sum12time in sum12times) {
+        if(sum34times.containsKey(-1*sum12time.key)){
+            num += sum12time.value * sum34times[-1*sum12time.key]!!
+        }
+    }
+    return num
+
+}
 
 
 //                   [1]        [1][3]      [1][2][3]
@@ -667,6 +787,91 @@ class Solutions {
             minLength
         }
     }
+
+    fun twoSum(nums: IntArray, target: Int): IntArray {
+
+        val map= mutableMapOf<Int,Int>()
+
+        var  index=0
+        nums.forEach {
+            map.put(it,index++)
+        }
+
+        var index1 =0
+        nums.forEach {  candidate ->
+            if(map.contains(target-candidate)){
+                val b =map[target-candidate]!!
+                if(b !=index1)
+                return IntArray(2){ resIndex ->
+                    if(resIndex==0) index1 else b
+                }
+            }
+
+            index1++
+        }
+
+        return emptyArray<Int>().toIntArray()
+    }
+
+    fun twoSum1(nums: IntArray, target: Int): IntArray {
+        repeat(nums.size){ i ->
+
+            for(j in i+1..nums.size-1){
+                if(nums[i]+nums[j]==target)
+                    return IntArray(2){ index ->
+                        if(index==0) i else j
+                    }
+            }
+        }
+        return emptyArray<Int>().toIntArray()
+    }
+
+    fun isHappy(n: Int): Boolean {
+
+        if(n==0) return false
+
+        fun getNext(n:Int): Int {
+            var now=n
+            var res =0
+            while(now>0){
+                val temp=now%10
+                res+= temp * temp
+                now =now /10
+            }
+            return res
+        }
+
+        val set= mutableSetOf<Int>()
+
+        var now=n.also {
+            set.add(it)
+        }
+
+        while(now!=1){
+
+            now=getNext(now)
+            if(now==1) {
+                return true
+            }else{
+                if(set.contains(now)) return false
+                set.add(now)
+            }
+        }
+
+        return true
+    }
+
+    /*
+    *
+    *  private int getNextNumber(int n) {
+            int res = 0;
+            while (n > 0) {
+                int temp = n % 10;
+                res += temp * temp;
+                n = n / 10;
+            }
+            return res;
+        }*/
 
     fun minSubArrayLen(target: Int, nums: IntArray): Int {
             var start=0
