@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include <android/log.h>
+
 extern "C" {
 
 #include "libavcodec/avcodec.h"
@@ -79,7 +81,6 @@ Java_com_aaaaa_a2k_MainActivity_showVideoPreview(JNIEnv *env, jobject thiz, jstr
         //fixme :释放
         return static_cast<jboolean>(false);
     }
-
 
     if (avformat_find_stream_info(avFormatContext, nullptr)) {
         //fixme:where

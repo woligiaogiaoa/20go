@@ -1,9 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
-apply plugin: 'kotlin-kapt'
 
 kapt {
     correctErrorTypes = true
@@ -13,8 +13,22 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/LICENSE-notice.md'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
+    }
+
     defaultConfig {
-        applicationId "com.jsn.a20k"
+        applicationId "com.wolfgames.cqbz"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
@@ -81,11 +95,11 @@ android {
 
 dependencies {
 
-    implementation 'com.huawei.hms:videokit-player:1.0.5.300'
+   /* implementation 'com.huawei.hms:videokit-player:1.0.5.300'
 
     implementation 'com.huawei.hms:videokit-player-fallback:1.0.5.300'
 
-    implementation 'com.huawei.hms:dynamic-loader-fallback:1.0.17.300'
+    implementation 'com.huawei.hms:dynamic-loader-fallback:1.0.17.300'*/
 
 
     implementation 'com.huawei.hms:scanplus:1.3.2.300'
@@ -138,7 +152,10 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
     testImplementation 'junit:junit:4.+'
+    implementation 'junit:junit:4.+'
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

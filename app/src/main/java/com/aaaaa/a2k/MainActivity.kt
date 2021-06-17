@@ -21,13 +21,17 @@ import androidx.lifecycle.MutableLiveData
 import com.aaaaa.a2k.ScreenShot.saveImageToGallery
 import com.aaaaa.a2k.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
-import java.lang.Runnable
+import java.lang.StringBuilder
 
 
 class MainActivity : AppCompatActivity() {
 
     val code=213
 
+    /*   1
+    * ----------    = (e -z)` *
+    * 1 +  e -z
+    * */
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,28 +68,41 @@ class MainActivity : AppCompatActivity() {
                     it.forEach { video ->
                         video {
                             id(index++)
-                            click {  v ->
-                                val name=getVideoFormatName(video.data).also {
+                            click { v ->
+                                val name = getVideoFormatName(video.data).also {
                                     Log.e(
                                         TAG,
                                         "video format${it}",
-                                    ) }
+                                    )
+                                }
 
-                                showToast(name)
+                                //showToast(name)
 
                                 GlobalScope.launch((Dispatchers.Default)) {
 
-                                    val bitmap= Bitmap.createBitmap(300,300,Bitmap.Config.ARGB_8888)
-                                    if(showVideoPreview(video.data.also {
-                                                Log.e(TAG, "videoFileUrl${it}")
-                                            }, bitmap))
-                                    withContext(Dispatchers.Main){
-                                            binding.iv.setImageBitmap(bitmap).also {
-                                                Log.e(TAG, "fuckckckck${bitmap}", )
-                                                saveImageToGallery(this@MainActivity,bitmap);
+                                    val bitmap =
+                                        Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
+                                    if (showVideoPreview(video.data.also {
+                                            Log.e(TAG, "videoFileUrl${it}")
+                                        }, bitmap)) {
+                                            runOnUiThread {
+                                                showToast("true")
                                             }
+
+                                        withContext(Dispatchers.Main) {
+                                            binding.iv.setImageBitmap(bitmap).also {
+                                                Log.e(TAG, "fuckckckck${bitmap}")
+                                                saveImageToGallery(this@MainActivity, bitmap);
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        runOnUiThread {
+                                            showToast("false")
+                                        }
                                     }
                                 }
+
                             }
                             videoInfo(video)
                         }
@@ -106,9 +123,7 @@ class MainActivity : AppCompatActivity() {
      */
     external fun stringFromJNI(): String
 
-
     external fun getVideoFormatName(path:String):String
-
 
     external fun showVideoPreview(path:String,bitmap: Bitmap):Boolean
 
@@ -165,7 +180,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     companion object {
         // Used to load the 'native-lib' library on application startup.
         init    {
@@ -213,6 +227,7 @@ class MainActivity : AppCompatActivity() {
                 MediaStore.Video.Media._ID,
                 MediaStore.Video.Media.DISPLAY_NAME,
                 MediaStore.Video.Media.DURATION,
+
                 MediaStore.Video.Media.SIZE,
                 MediaStore.Video.Media.DATA
         )
@@ -270,45 +285,428 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-fun threeSum(nums: IntArray): List<List<Int>> {
-    val valueIndexMap= mutableMapOf<Int,Int>()
+//aabaafa
+//aaf
+fun strStr(haystack: String, needle: String): Int {
+    if(needle.isEmpty()) return 0
+    //        end
+    if(haystack.length<needle.length) return -1
 
-    var indexa=0
-    nums.forEach {
-        valueIndexMap.put(it,indexa++)
+
+    val endIndex=haystack.length-1
+    val last=endIndex-(needle.length-1)
+
+    for(i in 0..last){
+        if(haystack.substring(i,i+needle.length).equals(needle))
+            return i
     }
-    if(nums.size<3) return emptyList()
 
-    val indexSumMap= mutableMapOf<Pair<Int,Int>,Int>()
+    return -1
+}
 
-    repeat(nums.size){ i ->
-        for(j in i +1..nums.size-1){
-            if(nums[i]!=nums[j])
-            indexSumMap[Pair(i,j)]=nums[i] +nums[j]
+fun reverseLeftWords(s: String, n: Int): String {
+    fun reverse(array:CharArray,head:Int,end:Int){
+        var l=head
+        var r=end
+        while(l<r) {
+            val j = array[r]
+            array[r] = array[l]
+            array[l] = j
+            l++
+            r--
         }
     }
 
+    var data=s.toCharArray()
+    reverse(data,0,n-1)
+    reverse(data,0,data.size-1)
+    reverse(data,0,data.size-n-1)
+    return String(data)
+}
+
+// 输入: s = "abcdefg", k = 2 输出: "cdefgab" //bacdefg
+
+fun reverse(array:CharArray,head:Int,end:Int){
+    var l=head
+    var r=end
+    while(l<r) {
+        val j = array[r]
+        array[r] = array[l]
+        array[l] = j
+        l++
+        r--
+    }
+}
+
+fun reverseWords(s: String): String {
+    var l=0
+    var r=s.length-1
+
+    var array=s.toCharArray()
+    while(l<r) {
+        val j = array[r]
+        array[r] = array[l]
+        array[l] = j
+        l++
+        r--
+    }
+
+    val builder=StringBuilder()
+    //   weqwew qwewqew qwewqe  qwe qwe qwe
+
+
+
+    var head=0
+
+    while(head<=array.size-1){
+        while(head<=array.size-1 && array[head]==' '){
+            head++
+        }
+        if(head>array.size-1)
+            break
+
+        var end=head
+        while(end+1<array.size && array[end+1]!=' '){
+            end++
+        }
+        reverse(array,head,end)
+        builder.append(" "+ String(array,head,end-head+1))
+        head=end
+        head++
+    }
+    return builder.toString().trim()
+}
+
+fun replaceSpace(s: String): String {
+    // " " to "%20"
+    s.replace(" ","%20",true)
+    val chars: Array<Char> = Array(s.length*3){
+        ' '
+    }
+    var idex=0
+    s.forEach {
+        if(it==' '){
+            chars[idex++]='%'
+            chars[idex++]='2'
+            chars[idex++]='0'
+        }else{
+            chars[idex++]=it
+        }
+    }
+
+    return String(chars.toCharArray()).substring(0,idex)
+}
+
+
+val TAG=""
+
+
+
+fun reverseString(s: CharArray): Unit {
+    var i =0
+    var j =s.size-1
+}
+
+
+/*Line 46: Char 5: error: expecting member declaration
+    while(index<=s.length-1){
+    ^
+Line 46: Char 10: error: expecting member declaration
+    while(index<=s.length-1){
+         ^
+Line 46: Char 11: error: expecting member declaration
+    while(index<=s.length-1){
+          ^
+Line 46: Char 16: error: expecting member declaration
+    while(index<=s.length-1){
+               ^
+Line 46: Char 18: error: expecting member declaration
+    while(index<=s.length-1){
+                 ^
+Line 46: Char 19: error: expecting member declaration
+    while(index<=s.length-1){
+                  ^
+Line 46: Char 20: error: expecting member declaration
+    while(index<=s.length-1){
+                   ^
+Line 46: Char 26: error: expecting member declaration
+    while(index<=s.length-1){
+                         ^
+Line 46: Char 27: error: expecting member declaration
+    while(index<=s.length-1){
+                          ^
+Line 46: Char 28: error: expecting member declaration
+    while(index<=s.length-1){
+                           ^
+Line 46: Char 29: error: expecting member declaration
+    while(index<=s.length-1){
+                            ^
+Line 46: Char 29: error: function declaration must have a name
+    while(index<=s.length-1){
+                            ^
+Line 56: Char 5: error: expecting member declaration
+    return res
+    ^
+Line 56: Char 12: error: expecting member declaration
+    return res
+           ^
+Line 58: Char 1: error: expecting a top level declaration
+}
+^
+Line 42: Char 13: error: unresolved reference: s
+    var res=s
+            ^
+Line 49: Char 23: error: unresolved reference: k
+        var end=index+k-1
+                      ^
+Line 51: Char 16: error: unresolved reference: s
+        if(end>s.length-1) end=s.length-1
+               ^
+Line 51: Char 32: error: unresolved reference: s
+        if(end>s.length-1) end=s.length-1
+                               ^
+Line 52: Char 13: error: unresolved reference: reverseIJ
+        res=reverseIJ(res,start,end)
+            ^
+Line 53: Char 18: error: unresolved reference: k
+        index+=2*k
+                 ^*/
+
+/*public String reverseStr(String s, int k) {
+        StringBuffer res = new StringBuffer();
+        int length = s.length();
+        int start = 0;
+        while (start < length) {
+            // 找到k处和2k处
+            StringBuffer temp = new StringBuffer();
+            // 与length进行判断，如果大于length了，那就将其置为length
+            int firstK = (start + k > length) ? length : start + k;
+            int secondK = (start + (2 * k) > length) ? length : start + (2 * k);
+
+            //无论start所处位置，至少会反转一次
+            temp.append(s.substring(start, firstK));
+            res.append(temp.reverse());
+
+            // 如果firstK到secondK之间有元素，这些元素直接放入res里即可。
+            if (firstK < secondK) { //此时剩余长度一定大于k。
+                res.append(s.substring(firstK, secondK));
+            }
+            start += (2 * k);
+        }
+        return res.toString();
+    }*/
+
+fun reverseStr(s: String, k: Int): String {
+
+    fun reverseIJ(s:String,i1 :Int,j1:Int):String{
+        var s1=s.toCharArray()
+        var i =i1
+        var j =j1
+        while(i<j){
+
+            var jchar=s1[j]
+            s1[j]=s1[i]
+            s1[i]=jchar
+
+            i++
+            j--
+        }
+
+        return String(s1)
+    }
+
+
+    var res: String =s
+
+    var index=0
+
+    while(index< res.length){
+        //index...index+k-1
+
+            //12121123213213
+
+        var end=index+k-1
+        var start=index
+        if(end>res.length-1) end=res.length-1
+        res=reverseIJ(res,start,end)
+        index += 2*k
+    }
+
+    return res
+}
+
+
+fun fourSum(nums: IntArray, target: Int): List<List<Int>> {
+    if (nums.size < 4) return emptyList()
+    nums.sort()
+    val resSet= mutableSetOf<MutableList<Int>>()
+    val res= mutableListOf<MutableList<Int>>()
+    repeat(nums.size){ i ->
+       for(j in i+1..nums.size-1){
+           var k=j+1
+           var q=nums.size-1
+           if(k>=q) break
+           while(k!=q){
+               val sum =nums[i]+nums[j]+nums[k]+nums[q]
+               if(sum==target){
+                   val new= mutableListOf<Int>().apply {
+                       add(nums[i])
+                       add(nums[j])
+                       add(nums[k])
+                       add(nums[q])
+                   }
+                   new.sort()
+                   if(!resSet.contains(new)){
+                       resSet.add(new)
+                       res.add(new)
+                   }
+                   k++
+               }else if(sum>target){
+                   q--
+               }else{
+                   k++
+               }
+           }
+       }
+    }
+    return res
+}
+
+fun threeSum2(nums: IntArray): List<List<Int>> {
+
+    /*输入：
+[-1,0,1,2,-1,-4] -4 -1 -1 0 1 2
+输出：
+[]
+预期结果：
+[[-1,-1,2],[-1,0,1]]*/
+
+    if (nums.size < 3) return emptyList()
+
+    val resSet= mutableSetOf<MutableList<Int>>()
+
     val res= mutableListOf<MutableList<Int>>()
 
-    for (mutableEntry in indexSumMap) {
-        val sum12 =mutableEntry.value
-        if(valueIndexMap.containsKey(-sum12)){
+    nums.sort()
+    repeat(nums.size){ i ->
+        var j =i+1
+        var k=nums.size-1
+        if(j>=k){
+            return@repeat
+        }
+        while(j!=k){
+            val sum=nums[i]+nums[j]+nums[k]
+            if(sum==0){
+               val new= mutableListOf<Int>().apply {
+                   add(nums[i])
+                   add(nums[j])
+                   add(nums[k])
+               }
+                new.sort()
+                if(!resSet.contains(new)){
+                    resSet.add(new)
+                    res.add(new)
+                }
+                j++
+            }else if(sum>0){
+                k--
+            }else{
+                j++
+            }
+        }
+    }
+    return res
+}
 
-            val index3 =valueIndexMap[-sum12]!!
+fun threeSum1(nums: IntArray): List<List<Int>> {
 
-            if(index3!=mutableEntry.key.first && index3!=mutableEntry.key.second){
-                res.add(mutableListOf<Int>().apply {
-                    add(nums.get(index3))
-                    add(nums[mutableEntry.key.first])
-                    add(nums[mutableEntry.key.second])
-                })
+    if (nums.size < 3) return emptyList()
+
+    val resSet= mutableSetOf<MutableList<Int>>()
+    val res= mutableListOf<MutableList<Int>>()
+
+    repeat(nums.size) { i ->
+        for (j in i + 1..nums.size - 1) {
+            for(k in j+1..nums.size-1){
+                if(nums[i]+nums[j]+nums[k]==0){
+                    val new=mutableListOf<Int>().apply {
+                        add(nums[i])
+                        add(nums[j])
+                        add(nums[k])
+                    }
+                    new.sort()
+                    if(!resSet.contains(new)){
+                        resSet.add(new)
+                        res.add(new)
+                    }
+                }
             }
         }
     }
 
+    return  res
+}
+
+
+/*输入
+[-1,0,1,2,-1,-4]
+输出
+[[1,-1,0],[0,-1,1],[-1,-1,2],[-1,0,1],[1,0,-1],[0,1,-1]]
+预期结果
+[[-1,-1,2],[-1,0,1]]*/
+fun threeSum(nums: IntArray): List<List<Int>> {
+
+    if (nums.size < 3) return emptyList()
+
+    val indexSumMap = mutableMapOf<Pair<Int, Int>, Int>()
+
+    repeat(nums.size) { i ->
+        for (j in i + 1..nums.size - 1) {
+                indexSumMap[Pair(i, j)] = nums[i] + nums[j]
+        }
+    }
+    val res = mutableListOf<MutableList<Int>>()
+
+    val listSet= mutableSetOf<MutableList<Int>>()
+
+    val resSet= mutableSetOf<MutableList<Int>>()
+
+    for (mutableEntry in indexSumMap) {
+        val sum12 = mutableEntry.value
+
+        var indexa = 0
+
+        nums.forEach {
+            if (it == -sum12) {
+
+                if (indexa != mutableEntry.key.first && indexa != mutableEntry.key.second) {
+
+                        val sortList= mutableListOf<Int>()
+                        sortList.add(indexa)
+                        sortList.add(mutableEntry.key.first)
+                        sortList.add(mutableEntry.key.second)
+                        sortList.sort()
+                        if(!listSet.contains(sortList)){
+                            listSet.add(sortList)
+                            Log.e(TAG, "threeSum:${sortList} in ${listSet} " )
+                            val new=mutableListOf<Int>().apply {
+                                add(nums[indexa])
+                                add(nums[mutableEntry.key.first])
+                                add(nums[mutableEntry.key.second])
+                            }
+                            new.sort()
+
+                            if(!resSet.contains(new)){
+                                resSet.add(new)
+                                res.add(new)
+                            }
+                        }
+                }
+            }
+            indexa++
+        }
+    }
     return res
-
-
 }
 
 fun canConstruct(ransomNote: String, magazine: String): Boolean {

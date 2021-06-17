@@ -34,7 +34,7 @@ class TestRoomActivity:AppCompatActivity() {
 
     val REQUEST_CODE_SCAN_DEFAULT_MODE=1002
 
-    val CAMERA_REQ_CODE=45456
+    val CAMERA_REQ_CODE=45456123
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
