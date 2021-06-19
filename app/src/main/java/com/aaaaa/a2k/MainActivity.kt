@@ -22,6 +22,7 @@ import com.aaaaa.a2k.ScreenShot.saveImageToGallery
 import com.aaaaa.a2k.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import java.lang.StringBuilder
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -111,6 +112,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun a(){
+        val a =PriorityQueue<Int>(100){ i: Int, i1: Int ->
+            i-i1
+        }
+        a.poll()
     }
 
     val handler= Handler(Looper.getMainLooper())
