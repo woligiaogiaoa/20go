@@ -1,6 +1,7 @@
 package com.aaaaa.a2k
 
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
 import kotlin.collections.ArrayDeque
@@ -17,6 +18,506 @@ class ExampleUnitTest {
 
     }*/
 
+    fun hasPathSum(root: TreeNode?, targetSum: Int): Boolean {
+        root ?: return false
+
+        fun traversal(root: TreeNode?,sum:Int): Boolean {
+            root?: return false
+            if(root.left==null && root.right==null){
+                if(root.`val`+sum==targetSum){
+                    return true
+                }
+                else{
+                    return false
+                }
+            }
+            return  traversal(root.left,root.`val`+sum) || traversal(root.right,root.`val`+sum)
+        }
+
+        return traversal(root,0)
+    }
+
+    fun findBottomLeftValue(root: TreeNode?): Int   {
+
+        root?: return -1
+
+        var Deep=-1
+
+        var res =root.`val`
+
+        fun traversal(root: TreeNode?,deep:Int){
+            root?: return
+            if(root.left==null && root.right==null){
+                if (deep>Deep){
+                    Deep=deep
+                    res =root.`val`
+                }
+            }else{
+                root?.left?.also {
+                    traversal(it,deep+1)
+                }
+                root?.right?.also {
+                    traversal(it,deep+1)
+                }
+            }
+        }
+
+        traversal(root,0)
+
+        return res
+    }
+
+    fun findBottomLeftValue1(root: TreeNode?): Int {
+        root ?: return -1
+        val quque:Deque<TreeNode> = LinkedList()
+        quque.offerFirst(root)
+
+
+        var node:TreeNode?=null
+        while(!quque.isEmpty()){
+            repeat(quque.size){ index ->
+                val a=quque.poll()
+
+                if(index==0){
+                    node=a
+                }
+
+                a.left?.also { quque.offer(it) }
+                a.right?.also { quque.offer(it) }
+            }
+        }
+
+        return node!!.`val`
+    }
+
+    fun sumOfLeftLeaves1(root: TreeNode?): Int {
+        root ?: return 0
+        var sum=0
+
+        fun preDo(root: TreeNode?){
+            root ?: return
+            if(root.left!=null && root.left!!.left==null && root.left!!.right==null){
+                sum+=root.left!!.`val`
+            }
+            preDo(root.left)
+            preDo(root.right)
+        }
+
+        preDo(root)
+        return sum
+    }
+
+    fun sumOfLeftLeaves(root: TreeNode?): Int {
+        root ?: return 0
+        var sum=0
+        val stack=Stack<TreeNode>()
+        stack.push(root)
+        while(!stack.isEmpty()){
+            val a =stack.pop()
+            a  //do some with a
+            if(a.left!=null && a.left!!.left==null && a.left!!.right==null){
+                sum+=a.left!!.`val`
+            }
+            a.left?.also { stack.push(it) }
+            a.right?.also { stack.push(it) }
+
+        }
+
+        return  sum
+
+    }
+
+
+    /**
+     * Example:
+     * var ti = TreeNode(5)
+     * var v = ti.`val`
+     * Definition for a binary tree node.
+     * class TreeNode(var `val`: Int) {
+     *     var left: TreeNode? = null
+     *     var right: TreeNode? = null
+     * }
+     */
+    fun mergeTrees1(root1: TreeNode?, root2: TreeNode?): TreeNode? {
+        if(root1==null && root2 ==null){
+            return null
+        }
+        var  newVal=0
+        root1?.also { newVal+= it .`val` }
+        root2?.also { newVal+= it .`val` }
+        val new=TreeNode(newVal)
+        new.left=mergeTrees1(root1?.left,root2?.left)
+        new.right=mergeTrees1(root1?.right,root2?.right)
+        return new
+    }
+
+    fun mergeTrees(root1: TreeNode?, root2: TreeNode?): TreeNode? {
+        root1?: return root2
+        val stack=Stack<TreeNode>()
+        stack.push(root1)
+        stack.push(root2)
+        while(!stack.isEmpty()){
+            val a =stack.pop()
+            val b =stack.pop()
+            a.`val`+=b.`val`
+            if(a.left!=null && b.left!=null){
+                stack.push(a.left)
+                stack.push(b.left)
+            }else{
+                if(a.left==null)
+                    a.left=b.left
+            }
+
+            if(a.right!=null && b.right!=null){
+                stack.push(a.right)
+                stack.push(b.right)
+            }else{
+                if(a.right==null)
+                    a.right=b.right
+            }
+        }
+
+        return root1
+    }
+
+    fun binaryTreePaths(root: TreeNode?): List<String> {
+
+
+        fun consString(node:TreeNode?,path:String,res:MutableList<String>){
+            node?: return
+            if(node.left==null && node?.right==null){
+
+                val a= if(!path.isEmpty()) path+"->"+node.`val` else  path+node.`val`
+                res.add(a)
+            }
+            node.left?.also {
+                val a= if(!path.isEmpty()) path+"->"+node.`val` else  path+node.`val`
+                consString(it,a,res )
+            }
+
+            node.right?.also {
+                val a= if(!path.isEmpty()) path+"->"+node.`val` else  path+node.`val`
+                consString(it,a,res )
+            }
+        }
+
+        val res = mutableListOf<String>()
+
+        consString(root,"",res)
+
+        return res
+    }
+
+    fun travelsal1(root: TreeNode?){
+        root ?: return
+        val stack=Stack<TreeNode>()
+
+        stack.push(root)
+    }
+
+
+
+    fun countNodes(root: TreeNode?): Int {
+        root ?:return  0
+        val quque:Deque<TreeNode> = LinkedList()
+        quque.offerFirst(root)
+
+        var size=0
+        while(!quque.isEmpty()){
+            repeat(quque.size){
+                val a =quque.poll()
+                size++
+                a.left?.also {
+                    quque.add(it)
+                }
+                a.right?.also {
+                    quque.add(it)
+                }
+            }
+        }
+
+        return size
+
+    }
+
+    fun preOrder(root: TreeNode){
+        val stack=Stack<TreeNode>()
+    }
+
+    fun isBalanced1(root: TreeNode?): Boolean {
+        var root: TreeNode? = root ?: return true
+        val stack: Stack<TreeNode> = Stack()
+        var pre: TreeNode? = null
+        while (root != null || !stack.isEmpty()) {
+            while (root != null) {
+                stack.push(root)
+                root = root.left
+            }
+            val inNode = stack.peek()
+            // 右结点为null或已经遍历过
+            if (inNode.right == null || inNode.right === pre) {
+                // 比较左右子树的高度差，输出
+                if (Math.abs(getHeight(inNode.left) - getHeight(inNode.right)) > 1) {
+                    return false
+                }
+                stack.pop()
+                pre = inNode
+                root = null // 当前结点下，没有要遍历的结点了
+            } else {
+                root = inNode.right // 右结点还没遍历，遍历右结点
+            }
+        }
+        return true
+        //
+    }
+
+    /**
+     * 层序遍历，求结点的高度
+     */
+    fun getHeight(root: TreeNode?): Int {
+        if (root == null) {
+            return 0
+        }
+        val deque: Deque<TreeNode?> = LinkedList()
+        deque.offer(root)
+        var depth = 0
+        while (!deque.isEmpty()) {
+            val size: Int = deque.size
+            depth++
+            for (i in 0 until size) {
+                val poll = deque.poll()
+                if (poll!!.left != null) {
+                    deque.offer(poll.left)
+                }
+                if (poll.right != null) {
+                    deque.offer(poll.right)
+                }
+            }
+        }
+        return depth
+    }
+
+
+    class TreeNode(var `val`: Int) {
+             var left: TreeNode? = null
+             var right: TreeNode? = null
+    }
+
+    fun height(root: TreeNode?):Int{
+        root?: return 0
+        return Math.max(height(root.left), height(root.right))+1
+    }
+
+    fun isBalanced(root: TreeNode?): Boolean {
+
+        if(height(root)<=2) return true
+
+        return isBalanced(root?.left) && isBalanced(root?.right) &&
+               Math.abs(height(root?.left) - height(root?.right)) <2
+    }
+
+    fun minDepth(root: TreeNode?):Int{
+        root ?: return 0
+        if(root.left==null && root.right==null){
+            return 1
+        }
+        if(root.left==null){
+            return 1+ minDepth(root.right)
+        }
+        if(root.right==null){
+            return 1+ minDepth(root.left)
+        }
+        return Math.min(minDepth(root.left),minDepth(root.right))+1
+    }
+
+
+    fun minDepth1(root: TreeNode?): Int {
+        //layer travelsal
+        val queue= mutableListOf<TreeNode>()
+        root ?: return 0
+        queue.add(root)
+        var depth= 0
+        while(!queue.isEmpty()){
+            depth++
+            repeat(queue.size){
+                val node=queue.removeAt(0)
+                if(node.left==null && node.right==null)
+                    return depth
+                node.left?.also { queue.add(it) }
+                node.right?.also { queue.add(it) }
+            }
+        }
+        return depth
+    }
+
+    fun maxDepth(root: TreeNode?): Int {
+            //layer travelsal
+        val queue= mutableListOf<TreeNode>()
+        root ?: return 0
+        queue.add(root)
+        var depth= 0
+        while(!queue.isEmpty()){
+            depth++
+            repeat(queue.size){
+                val node=queue.removeAt(0)
+                node.left?.also { queue.add(it) }
+                node.right?.also { queue.add(it) }
+            }
+        }
+        return depth
+    }
+
+
+    fun isSymmetric3(root: TreeNode): Boolean {
+        val deque: Queue<TreeNode?> = LinkedList()
+        deque.offer(root.left)
+        deque.offer(root.right)
+        while (!deque.isEmpty()) {
+            val leftNode = deque.poll()
+            val rightNode = deque.poll()
+            if (leftNode == null && rightNode == null) {
+                continue
+            }
+
+            if (leftNode == null || rightNode == null || leftNode.`val` !== rightNode.`val`) {
+                return false
+            }
+
+            deque.offer(leftNode.left)
+            deque.offer(rightNode.right)
+            deque.offer(leftNode.right)
+            deque.offer(rightNode.left)
+        }
+        return true
+    }
+
+    //[1,2,2,2,null,2]
+    fun isSymmetric(root: TreeNode?): Boolean {
+        val queque=LinkedList<TreeNode?>()
+        queque.offerFirst(root?.left)
+        queque.offerLast(root?.right)
+        while(!queque.isEmpty()){
+            val a=queque.pollFirst()
+            val b=queque.pollLast()
+            if(a==null && b==null) continue
+            if(a==null || b ==null || a.`val`!=b.`val`) return false
+            queque.offerFirst(a.right)
+            queque.offerLast(b.left)
+            queque.offerFirst(a.left)
+            queque.offerLast(b.right)
+        }
+        return true
+    }
+
+    fun invertTree(root: TreeNode?): TreeNode?{
+
+        fun invertSub(root: TreeNode?){
+            root?: return
+            invertSub(root.left)
+            invertSub(root.right)
+
+            val temp=root.left
+            root.left=root.right
+            root.right=temp
+        }
+
+        invertSub(root)
+
+        return  root
+    }
+
+    fun invertTree1(root: TreeNode?): TreeNode? {
+
+        fun InOrderDo(node: TreeNode?, action: TreeNode.() -> Unit){
+           node?.also {
+              it.apply {
+                  this.action()
+              }
+               it.left?.apply {
+                   InOrderDo(it.left, action)
+               }
+               it.right?.apply {
+                   InOrderDo(it.right, action)
+               }
+           }
+        }
+
+        InOrderDo(root){
+            val temp=right
+            right=left
+            left=temp
+        }
+        return root
+    }
+
+    @Test
+    fun testStackInOrder(){
+        val data=TreeNode(1).apply {
+            left= TreeNode(2)
+            right=TreeNode(3).apply {
+                left= TreeNode(4)
+                right= TreeNode(5)
+            }
+        }
+        assertArrayEquals(arrayOf(2, 1, 4, 3, 5).toIntArray(), inOrder(TreeNode(1).apply {
+            left = TreeNode(2)
+            right = TreeNode(3).apply {
+                left = TreeNode(4)
+                right = TreeNode(5)
+            }
+        }))
+    }
+
+
+    fun inOrder(root: TreeNode?):IntArray{
+
+        val data= mutableListOf<Int>()
+        val st=Stack<TreeNode?>()
+        root?.also { st.push(it) }
+        while(!st.isEmpty()){
+            val top=st.pop()
+            if(top!=null){
+                top.right?.also { st.push(it) }
+                st.push(top)
+                st.push(null)
+                top.left?.also { st.push(it) }
+            }else{
+                val targer: TreeNode? =st.pop()
+                //do something
+                data.add(targer!!.`val`)
+            }
+        }
+        return data.toIntArray()
+    }
+
+    fun levelOrder(root: TreeNode?): List<List<Int>> {
+
+        val res = mutableListOf<MutableList<Int>>()
+        val queue= mutableListOf<TreeNode>()
+        root?.also {
+            queue.add(it)
+        }
+        while(!queue.isEmpty()){
+
+            val layer= mutableListOf<Int>()
+            repeat(queue.size){
+                queue.first().left?.also {
+                    queue.add(it)
+                }
+                queue.first().right?.also {
+                    queue.add(it)
+                }
+
+                layer.add(queue.first().`val`)
+                queue.removeAt(0)
+            }
+            res.add(layer)
+        }
+
+        return  res
+    }
+
+
     @Test
     fun testBQ(){
 
@@ -25,6 +526,35 @@ class ExampleUnitTest {
    /* fun topKFrequent(nums: IntArray, k: Int): IntArray {
 
     }*/
+
+    fun topKFrequent(nums: IntArray, k: Int): IntArray {
+
+        val fMap= mutableMapOf<Int, Int>()
+        nums.forEach {
+            val old=fMap.getOrDefault(it, 0)
+            fMap[it]=old+1
+        }
+        val entries: MutableSet<MutableMap.MutableEntry<Int, Int>> = fMap.entries
+
+        val queque=PriorityQueue<MutableMap.MutableEntry<Int, Int>>(){ mutableEntry: MutableMap.MutableEntry<Int, Int>, mutableEntry1: MutableMap.MutableEntry<Int, Int> ->
+            mutableEntry.value-mutableEntry1.value
+        }
+        entries.forEach {
+            queque.add(it)
+            if(queque.size>k){
+                queque.poll()
+            }
+        }
+
+        val res=IntArray(queque.size)
+
+        var index =0
+        queque.forEach {
+            res[index++]=it.key
+        }
+
+        return  res
+    }
 
     class BigQueue(val size: Int){
 
@@ -467,7 +997,6 @@ fun removeNthFromEnd(head: ListNode?, n: Int): ListNode? {
 
 
 }
-
 
 fun swapPairs1(head: ListNode?): ListNode? {
 

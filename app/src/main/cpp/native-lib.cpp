@@ -62,6 +62,8 @@ Java_com_aaaaa_a2k_MainActivity_getVideoFormatName(JNIEnv *env, jobject thiz, js
 
 
 
+const  char* TAG="native_lib";
+
 
 
 
@@ -79,6 +81,7 @@ Java_com_aaaaa_a2k_MainActivity_showVideoPreview(JNIEnv *env, jobject thiz, jstr
     if (avformat_open_input(&avFormatContext, mediaFilePath, nullptr, nullptr)) {
         //error occur
         //fixme :释放
+        __android_log_print(ANDROID_LOG_ERROR,TAG,"avformat_open_input fail");
         return static_cast<jboolean>(false);
     }
 
