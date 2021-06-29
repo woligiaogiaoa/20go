@@ -5,6 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
 import kotlin.collections.ArrayDeque
+import kotlin.math.max
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -17,6 +18,233 @@ class ExampleUnitTest {
         head ?: return null
 
     }*/
+
+
+    fun lowestCommonAncestor(root: TreeNode?, p: TreeNode?, q: TreeNode?): TreeNode? {
+
+        root?: return null
+
+        if(root===q || root==p)
+            return root
+
+        val left=lowestCommonAncestor(root?.left,p,q)
+        val right=lowestCommonAncestor(root?.right,p,q)
+
+        if(left!=null && right !=null) return  root
+
+        if(left!=null && right==null){
+            return  left
+        }else if(left==null && right!=null){
+            return  right
+        }else{
+            return null
+        }
+    }
+
+    fun lowestCommonAncestorq(root: TreeNode?, p: TreeNode?, q: TreeNode?): TreeNode? {
+
+        fun isAncestor(root: TreeNode?, p: TreeNode?): Boolean {
+            root?: return false
+            p?: return false
+            if(root.left===p || root.right===p) return true
+            return isAncestor(root.left,p) || isAncestor(root.right,p)
+        }
+
+        root?: return null
+        q?: return null
+        p?: return null
+
+        var parent:TreeNode?=null
+        val queue:Deque<TreeNode> =LinkedList()
+
+        queue.offer(root)
+        while(!queue.isEmpty()){
+            repeat(queue.size){
+                val a =queue.poll()
+                if(isAncestor(a,p) && isAncestor(a,q))
+                    parent=a
+                a.left?.also { queue.offer(it) }
+                a.right?.also { queue.offer(it) }
+            }
+        }
+        return parent
+    }
+
+    fun findMode(root: TreeNode?): IntArray {
+
+        var pre:Int?=null
+
+        var  count=0
+        var  maxCount=0
+
+        val res= mutableListOf<Int>()
+
+
+        fun traversal(root: TreeNode?){
+            root?: return
+
+            traversal(root.left)
+            root.also {
+                if(pre==null){
+                    count++
+                }
+
+                else{
+                    if(root.`val`==pre){
+                        count++
+                    }else{
+                        count=1
+                    }
+                }
+
+                if(count>maxCount){
+                    res.removeAll { true }
+                    res.add(root.`val`)
+                    maxCount=count
+                } else if(count==maxCount){
+                    res.add(root.`val`)
+                }
+
+                pre=root.`val`
+            }
+
+
+            traversal(root.right)
+        }
+
+        traversal(root)
+
+        return res.toIntArray()
+    }
+
+    fun getMinimumDifference(root: TreeNode?): Int {
+
+       var pre:Int?=null
+
+       var min:Int?=null
+
+       fun traversal(root: TreeNode?){
+           root?: return
+
+           traversal(root.left)
+           root?.also {
+               if(pre!=null){
+                   if(min==null)
+                       min=Math.abs(pre!!-root.`val`)
+                   else
+                       min=Math.min(min!!,Math.abs(pre!!-root.`val`))
+               }
+               pre=root.`val`
+           }
+           traversal(root.right)
+       }
+
+       traversal(root)
+       return min ?: 0
+   }
+
+    fun isValidBST(root: TreeNode?): Boolean {
+
+        var now:Int?=null
+
+        var sheng=true
+        //5 1 4 n n 3 6
+
+        fun traversal(root: TreeNode?){
+            root ?: return
+
+            traversal(root.left)
+
+            if( now!=null){
+                if( root.`val`<=now!!){
+                    sheng=false
+                }
+            }
+
+            now=root.`val`
+
+            traversal(root.right)
+        }
+
+        traversal(root)
+
+        return sheng
+    }
+
+    fun searchBST(root: TreeNode?, `val`: Int): TreeNode? {
+        root ?: return null
+        if(root.`val`==`val`) return  root
+        if(root.`val`>`val`) return  searchBST(root.left,`val`)
+        return   searchBST(root.left,`val`)
+    }
+
+    fun constructMaximumBinaryTree(nums: IntArray): TreeNode? {
+        val size=nums.size
+        if(size<=0) return null
+        if(size==1) return TreeNode(nums[0])
+
+        var max=Int.MIN_VALUE
+        var iterator=0
+
+        var maxIndex=0
+        nums.forEach {
+            if(it>max){
+                max=it
+                maxIndex=iterator
+            }
+            iterator++
+        }
+
+        val root=TreeNode(nums[maxIndex])
+
+        root.left=constructMaximumBinaryTree(
+                nums.filterIndexed { index, i ->
+                    index<maxIndex
+                }.toIntArray()
+        )
+        root.right=constructMaximumBinaryTree(
+                nums.filterIndexed { index, i ->
+                    index>maxIndex
+                }.toIntArray()
+        )
+        return root
+    }
+
+    fun buildTree(inorder: IntArray, postorder: IntArray): TreeNode? {
+
+        fun traversal(inorder: IntArray, postorder: IntArray):TreeNode?{
+            val size=postorder.size
+            if(size<=0) return null
+            val root=TreeNode(postorder[size-1])
+
+            if(postorder.size==1) return root
+
+            val rootIndexInOrder=inorder.indexOf(root.`val`)
+
+            val inOrderLeft=inorder.filterIndexed { index, i ->
+                index<rootIndexInOrder
+            }.toIntArray()
+            val inOrderRight=inorder.filterIndexed { index, i ->
+                index>rootIndexInOrder
+            }.toIntArray()
+
+            val postOrderLeft=postorder.filterIndexed { index, i ->
+                index<inOrderLeft.size
+            }.toIntArray()
+
+            val postOrderRight=postorder.filterIndexed { index, i ->
+                inOrderLeft.size<=index && index<postorder.size-1
+            }.toIntArray()
+
+            root.left=traversal(inOrderLeft, postOrderLeft)
+            root.right=traversal(inOrderRight, postOrderRight)
+
+            return root
+        }
+
+        return traversal(inorder,postorder)
+
+    }
 
     fun hasPathSum(root: TreeNode?, targetSum: Int): Boolean {
         root ?: return false
@@ -153,24 +381,25 @@ class ExampleUnitTest {
 
     fun mergeTrees(root1: TreeNode?, root2: TreeNode?): TreeNode? {
         root1?: return root2
+        root2?: return root1
         val stack=Stack<TreeNode>()
-        stack.push(root1)
         stack.push(root2)
+        stack.push(root1)
         while(!stack.isEmpty()){
             val a =stack.pop()
             val b =stack.pop()
             a.`val`+=b.`val`
             if(a.left!=null && b.left!=null){
-                stack.push(a.left)
                 stack.push(b.left)
+                stack.push(a.left)
             }else{
                 if(a.left==null)
                     a.left=b.left
             }
 
             if(a.right!=null && b.right!=null){
-                stack.push(a.right)
                 stack.push(b.right)
+                stack.push(a.right)
             }else{
                 if(a.right==null)
                     a.right=b.right
