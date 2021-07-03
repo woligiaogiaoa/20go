@@ -2,6 +2,7 @@ package com.aaaaa.a2k.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.Image
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -11,12 +12,15 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.marginLeft
 import androidx.core.view.marginTop
+import coil.load
 import com.aaaaa.a2k.R
+import com.bumptech.glide.Glide
 import kotlin.math.abs
 
 
@@ -78,10 +82,22 @@ class FActivity :AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_f)
-        val layoutParams=FrameLayout.LayoutParams(100,100)
+        val layoutParams=FrameLayout.LayoutParams(150,150)
         layoutParams.gravity = Gravity.LEFT or Gravity.TOP  
-        val new=FrameLayout(this).also { float=it }
-        new.setBackgroundColor(getColor(android.R.color.darker_gray))
+        val new=ImageView(this).also { float=it }
+        new.scaleType=ImageView.ScaleType.FIT_XY
+        new.elevation= dp2px(this,2f).toFloat()
+        new.apply {
+         /*   Glide.with(context.applicationContext).asGif()
+                .load(
+                    "https://media1.giphy.com/media/BzyTuYCmvSORqs1ABM/200w.webp?cid=ecf05e47sa0l7xcseyni16vu7mjgxa19ge3dw2wjwpujaqqz&rid=200w.webp&ct=g")
+
+                //.apply(sharedOptions)
+                .into(this);
+            //load("")*/
+            setImageResource(R.mipmap.steam)
+        }
+        //new.setBackgroundColor(getColor(android.R.color.darker_gray))
         new.layoutParams=layoutParams
 
         var downX=0
@@ -162,7 +178,7 @@ class FActivity :AppCompatActivity() {
                     onDis(dx,dy,viewState)
                 }
                 MotionEvent.ACTION_UP -> {
-                    handler.postDelayed(hideF,2000)
+                    handler.postDelayed(hideF,3000)
                     if( abs(x-downX) <distance &&    abs(y-downY) <distance
                             && event.eventTime - event.downTime < MIN_TAP_TIME){
                         v.performClick()
@@ -180,7 +196,7 @@ class FActivity :AppCompatActivity() {
 
         parentFrame.addView(new)
 
-        handler.postDelayed(hideF,1500)
+        handler.postDelayed(hideF,3000)
 
     }
 
