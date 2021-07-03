@@ -1,11 +1,15 @@
 package com.aaaaa.a2k
 
+import android.util.Log
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayDeque
+import kotlin.collections.ArrayList
 import kotlin.math.max
+import kotlin.math.sin
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -16,19 +20,282 @@ class ExampleUnitTest {
 
    /* fun detectCycle(head: ListNode?): ListNode? {
         head ?: return null
-
     }*/
 
+        fun combinationSum3(k: Int, n: Int): List<List<Int>> {
 
-    fun lowestCommonAncestor(root: TreeNode?, p: TreeNode?, q: TreeNode?): TreeNode? {
+           // return  combine(9,k,n)
+
+            val res= mutableListOf<MutableList<Int>> ()
+
+            val path= mutableListOf<Int>()
+
+            var sum = 0
+
+            fun t(node:Int){
+                if(sum==n && path.size==k){
+                    res.add(ArrayList(path))
+                    return
+                }
+                val need=k-path.size
+
+                val end=9-((k-path.size)-1)
+
+                for(i in node+1..end){
+                    path.add(i)
+                    sum+=i
+                    t(i)
+                    path.remove(i)
+                    sum-=sum
+                }
+            }
+
+            t(0)
+            return  res
+        }
+
+
+        fun combine(n: Int, k: Int,sum:Int): List<List<Int>> {
+
+            val path= mutableListOf<Int>()
+
+            val res= mutableListOf<MutableList<Int>>()
+
+            fun t(n:Int,k:Int,i:Int){
+                if(path.size==k){
+                    var pre= 0
+                    path.forEach {
+                        pre+=it
+                    }
+                    if(pre==sum)
+                        res.add(ArrayList(path))
+                    return
+                }
+
+                for(j in i+1..n){
+                    val need=k-path.size
+                    val remainMax=n-j+1
+                    if(need>remainMax)
+                        return
+                    path.add(j)
+                    println("add ${j}")
+                    t(n,k,j)
+                    println("remove ${j}")
+                    path.remove(j)
+                }
+            }
+
+            t(n,k ,0)
+
+            return  res
+        }
+
+    @Test
+    fun t1212(){
+        //combine(4,2)
+
+
+        for(i in 100..9){
+            println(i)
+        }
+        assertEquals(true,true)
+    }
+
+    fun h (root: TreeNode?): Int {
+        root ?: return 0
+        return  1 + max(h(root.left),h(root.right))
+    }
+
+    fun convertBST(root: TreeNode?): TreeNode? {
+        var ac=0
+
+        fun t(root: TreeNode?){
+            root ?: return
+            t (root.right)
+            root.`val`+= ac
+            ac = root.`val`
+            t(root.left)
+        }
+        t(root)
+        return  root
+    }
+
+
+    fun sortedArrayToBST(nums: IntArray): TreeNode? {
+
+        fun consToTree(nums: IntArray):TreeNode?{
+            if(nums.size==0 )
+                return null
+
+            val medium=(nums.size-1)/2
+            val new=TreeNode(nums[medium])
+
+            val left= mutableListOf<Int>()
+            for(i in 0..medium-1){
+                left.add(nums[i])
+            }
+            new.left=consToTree(left.toIntArray())
+
+            val right= mutableListOf<Int>()
+            for(i in medium+1..nums.size-1){
+                right.add(nums[i])
+            }
+            new.left=consToTree(left.toIntArray())
+            new.right=consToTree(right.toIntArray())
+            return new
+        }
+
+        return  consToTree(nums)
+
+    }
+
+    fun trimBST(root: TreeNode?, low: Int, high: Int): TreeNode? {
+        root ?: return null
+        if(root.`val`>high){
+            val left=trimBST(root.left,low,high)
+            return left
+        }
+        if(root.`val`<low){
+            val right=trimBST(root.right,low,high)
+            return right
+        }
+
+        root.left=trimBST(root.left,low,high)
+        root.right=trimBST(root.right,low,high)
+        return root
+    }
+
+    fun deleteNode(root: TreeNode?, key: Int): TreeNode? {
+
+        root ?: return root
+
+
+        if(key==root.`val`){
+            if(root.left==null && root.right==null){
+                return null
+            }else if(root.left!=null && root.right==null){
+                return root.left
+            }else if(root.left==null && root.right!=null){
+                return root.right
+            } else{ //
+                val originalLeft=root.left
+                val originalRight=root.right
+                var a=originalRight
+                while(a!=null && a.left!=null){
+                    a=a.left
+                }
+                a!!.left=originalLeft
+                return originalRight
+            }
+        }
+
+        if(key<root.`val`){
+            root.left=deleteNode(root.left,key)
+        }
+
+
+        if(key>root.`val`){
+            root.right=deleteNode(root.right,key)
+        }
+
+        return root
+
+    }
+
+    var parent_insertIntoBST: TreeNode? = null
+
+    var res: TreeNode? = null
+
+    var onceLock = true
+
+    fun insertIntoBST(root: TreeNode?, `val`: Int): TreeNode? {
+
+        if (onceLock) {
+            onceLock=false
+            res = root
+        }
+
+        parent_insertIntoBST = root
+
+        if (root == null) {
+            if (parent_insertIntoBST == null)
+                return TreeNode(`val`)
+
+
+            val new = TreeNode(`val`)
+            if (`val` < parent_insertIntoBST!!.`val`)
+                parent_insertIntoBST!!.left = new
+            else
+                parent_insertIntoBST!!.right = new
+
+            return res
+
+        }
+
+        if (`val` < root!!.`val`) {
+            insertIntoBST(root.left, `val`)
+        }
+
+        if (`val` > root!!.`val`) {
+            insertIntoBST(root.right, `val`)
+        }
+
+        return null
+
+    }
+
+    fun insertIntoBSTt(root: TreeNode?, `val`: Int): TreeNode? {
+        root?: return TreeNode(`val`)
+        var cur=root
+        var parent=root
+        while(cur!=null){
+            parent=cur
+            if(cur.`val`<`val`)
+                cur=cur.right
+            else
+                cur=cur.left
+
+        }
+
+        if(parent!!.`val`<`val`)
+            parent.right= TreeNode(`val`)
+        else
+            parent.left= TreeNode(`val`)
+
+        return root
+
+    }
+
+    fun lowestCommonAncestor(root: TreeNode?, p: TreeNode?, q: TreeNode?): TreeNode?{
+        root ?: return null
+        p ?: return q
+        q ?: return p
+
+        var cur=root
+
+        while(cur!=null){
+            if(p.`val`< root.`val` && root.`val` > q.`val`){
+                cur=root.left
+            }else if(q.`val` > root.`val` && root.`val`<p.`val`){
+                cur=root.right
+            }else {
+                return  root
+            }
+        }
+        return null
+    }
+
+    fun lowestCommonAncestor1(root: TreeNode?, p: TreeNode?, q: TreeNode?): TreeNode?    {
+
+        val deque:Deque<TreeNode> = LinkedList()
 
         root?: return null
 
         if(root===q || root==p)
             return root
 
-        val left=lowestCommonAncestor(root?.left,p,q)
-        val right=lowestCommonAncestor(root?.right,p,q)
+        val left=lowestCommonAncestor1(root?.left,p,q)
+        val right=lowestCommonAncestor1(root?.right,p,q)
 
         if(left!=null && right !=null) return  root
 

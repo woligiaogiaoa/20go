@@ -12,6 +12,7 @@ import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import com.aaaaa.a2k.ScreenShot.saveImageToGallery
 import com.aaaaa.a2k.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
+import java.io.File
 import java.lang.StringBuilder
 import java.util.*
 
@@ -62,6 +64,7 @@ class MainActivity : AppCompatActivity() {
                         id("testdb")
                         click {  _ ->
                             //todo :test db
+                            getPackageName()
 
                         }
                     }
@@ -112,6 +115,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        //o + 1
 
     }
 
@@ -349,6 +354,8 @@ fun reverse(array:CharArray,head:Int,end:Int){
 }
 
 fun reverseWords(s: String): String {
+
+
     var l=0
     var r=s.length-1
 
