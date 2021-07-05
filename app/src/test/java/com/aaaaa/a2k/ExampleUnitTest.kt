@@ -22,6 +22,17 @@ class ExampleUnitTest {
         head ?: return null
     }*/
 
+    fun letterCombinations(digits: String): List<String> {
+        
+        return emptyList()
+    }
+
+    @Test
+    fun asc(){
+        val a =97
+        assertEquals('a',a.toChar())
+    }
+
         fun combinationSum3(k: Int, n: Int): List<List<Int>> {
 
            // return  combine(9,k,n)

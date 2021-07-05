@@ -1,5 +1,7 @@
 package com.aaaaa.a2k.widget
 
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.Image
@@ -43,6 +45,8 @@ class FActivity :AppCompatActivity() {
 
     lateinit var float:View
 
+    var hideAnimatior:AnimatorSet?=null
+
 
     val hideF=object :Runnable{
 
@@ -59,14 +63,66 @@ class FActivity :AppCompatActivity() {
 
             if(floatLeft()){
                 val old = float.layoutParams as FrameLayout.LayoutParams
-                old.leftMargin=0
-                float.layoutParams=old
-                float.translationX= -float.measuredWidth *0.5f
+
+                val originalLeftMargin=old.leftMargin
+                //float.layoutParams=old
+
+                val targetTX=-float.measuredWidth *0.5f
+                //float.translationX= -float.measuredWidth *0.5f
+
+                val a1=ValueAnimator.ofInt(originalLeftMargin,0).apply {
+                    duration=500
+                    addUpdateListener {
+                        val params = float.layoutParams as FrameLayout.LayoutParams
+                        params.leftMargin=it.animatedValue as Int
+                        float.layoutParams=params
+                    }
+                }
+
+                val a2=ValueAnimator.ofFloat(float.translationX,targetTX).apply {
+                    duration=500
+                    addUpdateListener {
+                        float.translationX=it.animatedValue as Float
+                    }
+                }
+                hideAnimatior=AnimatorSet().apply {
+                    play(a1)
+                        .with(a2)
+                    start()
+                }
+
             }else{
                 val old = float.layoutParams as FrameLayout.LayoutParams
-                old.leftMargin=width-float.measuredWidth
-                float.layoutParams=old
-                float.translationX= float.measuredWidth *0.5f
+                //old.leftMargin=width-float.measuredWidth
+                val originalLeftMargin=old.leftMargin
+                //float.layoutParams=old
+                val targetTX=float.measuredWidth *0.5f
+
+                //float.translationX= float.measuredWidth *0.5f
+
+
+                val a1=ValueAnimator.ofInt(originalLeftMargin,width-float.measuredWidth).apply {
+                    duration=500
+                    addUpdateListener {
+                        val params = float.layoutParams as FrameLayout.LayoutParams
+                        params.leftMargin=it.animatedValue as Int
+                        float.layoutParams=params
+                    }
+                }
+
+                val a2=ValueAnimator.ofFloat(float.translationX,targetTX).apply {
+                    duration=500
+                    addUpdateListener {
+                        addUpdateListener {
+                            float.translationX=it.animatedValue as Float
+                        }
+                    }
+                }
+                hideAnimatior=AnimatorSet().apply {
+                    play(a1)
+                        .with(a2)
+                    start()
+                }
             }
         }
 
@@ -158,6 +214,9 @@ class FActivity :AppCompatActivity() {
             val x =event.rawX.toInt()
             val y =event.rawY.toInt()
 
+            if(hideAnimatior!=null && hideAnimatior!!.isRunning)
+                return@setOnTouchListener false
+
 
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -205,5 +264,10 @@ class FActivity :AppCompatActivity() {
     }
     val MIN_TAP_TIME = 1000
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        hideAnimatior?.cancel()
+    }
 
 }
