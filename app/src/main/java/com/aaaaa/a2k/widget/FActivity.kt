@@ -13,13 +13,14 @@ import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.marginLeft
-import androidx.core.view.marginTop
+import androidx.core.graphics.Insets
+import androidx.core.view.*
 import coil.load
 import com.aaaaa.a2k.R
 import com.bumptech.glide.Glide
@@ -38,14 +39,20 @@ class FActivity :AppCompatActivity() {
             get()=window.decorView.findViewById<FrameLayout>(android.R.id.content)
 
     val width
-    get() = ScreenUtils.getAppScreenWidth()
+    get() = ScreenUtils.getScreenWidth()
 
     val height
-    get() = ScreenUtils.getAppScreenHeight()
+    get() = ScreenUtils.getScreenHeight()
 
     lateinit var float:View
 
     var hideAnimatior:AnimatorSet?=null
+
+
+    var insetsBottom:Int?=null
+    var insetsTop:Int?=null
+    var insetsLeft:Int?=null
+    var insetsRight:Int?=null
 
 
     val hideF=object :Runnable{
@@ -128,6 +135,8 @@ class FActivity :AppCompatActivity() {
 
     }
 
+
+
     fun floatNormal(){
         float.alpha=1f
         float.translationX=0f
@@ -138,6 +147,7 @@ class FActivity :AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_f)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val layoutParams=FrameLayout.LayoutParams(150,150)
         layoutParams.gravity = Gravity.LEFT or Gravity.TOP  
         val new=ImageView(this).also { float=it }
@@ -175,17 +185,27 @@ class FActivity :AppCompatActivity() {
             var newl=dx+viewState!!.leftMargin
             var newt=dy+viewState.topMargin
 
-            if(newt>height-new.measuredHeight)
-                newt=height-new.measuredHeight
-            if(newt<0)
-                newt=0
+            val topBorder=if(insetsTop!=null) insetsTop!! else 0
+
+            val bottomBorder=if(insetsBottom!=null) height-insetsBottom!! else height
 
 
-            if(newl>width-new.measuredWidth)
-                newl=width-new.measuredWidth
+            if(newt>bottomBorder-new.measuredHeight)
+                newt=bottomBorder-new.measuredHeight
 
-            if(newl<0)
-                newl=0
+            if(newt<topBorder)
+                newt=topBorder
+
+
+            val leftBorder=if(insetsLeft!=null) insetsLeft!! else 0
+
+            val rightBorder=if(insetsRight!=null) width-insetsRight!! else width
+
+            if(newl>rightBorder-float.measuredWidth)
+                newl=rightBorder-float.measuredWidth
+
+            if(newl<leftBorder)
+                newl=leftBorder
 
             old.leftMargin = newl
             old.topMargin = newt
@@ -237,7 +257,7 @@ class FActivity :AppCompatActivity() {
                     onDis(dx,dy,viewState)
                 }
                 MotionEvent.ACTION_UP -> {
-                    handler.postDelayed(hideF,3000)
+                    handler.postDelayed(hideF,1000)
                     if( abs(x-downX) <distance &&    abs(y-downY) <distance
                             && event.eventTime - event.downTime < MIN_TAP_TIME){
                         v.performClick()
@@ -255,7 +275,64 @@ class FActivity :AppCompatActivity() {
 
         parentFrame.addView(new)
 
-        handler.postDelayed(hideF,3000)
+        handler.postDelayed(hideF,1000)
+
+        ViewCompat.setOnApplyWindowInsetsListener(float) { view, windowInsets ->
+            val insets: Insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply the insets as a margin to the view. Here the system is setting
+            // only the bottom, left, and right dimensions, but apply whichever insets are
+            // appropriate to your layout. You can also update the view padding
+            // if that's more appropriate.
+           /* view.updateLayoutParams<MarginLayoutParams>(
+                leftMargin = insets.left,
+                bottomMargin = insets.bottom,
+                rightMargin = insets.right,
+            )*/
+
+            insetsLeft = insets.left
+            insetsTop = insets.top
+            insetsRight = insets.right
+            insetsBottom=insets.bottom
+
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams>{
+                val old = new.layoutParams as FrameLayout.LayoutParams
+                var newl=old.leftMargin
+                var newt=old.topMargin
+
+                val topBorder=if(insetsTop!=null) insetsTop!! else 0
+
+                val bottomBorder=if(insetsBottom!=null) height-insetsBottom!! else height
+
+
+                if(newt>bottomBorder-new.measuredHeight)
+                    newt=bottomBorder-new.measuredHeight
+
+                if(newt<topBorder)
+                    newt=topBorder
+
+
+                val leftBorder=if(insetsLeft!=null) insetsLeft!! else 0
+
+                val rightBorder=if(insetsRight!=null) width-insetsRight!! else width
+
+                if(newl>rightBorder-float.measuredWidth)
+                    newl=rightBorder-float.measuredWidth
+
+                if(newl<leftBorder)
+                    newl=leftBorder
+
+                old.leftMargin = newl
+                old.topMargin = newt
+                new.layoutParams = old
+            }
+
+
+
+
+            // Return CONSUMED if you don't want want the window insets to keep being
+            // passed down to descendant views.
+            WindowInsetsCompat.CONSUMED
+        }
 
     }
 
