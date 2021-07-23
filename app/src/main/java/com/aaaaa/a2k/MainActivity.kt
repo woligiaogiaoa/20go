@@ -1,4 +1,4 @@
-package com.aaaaa.a2k
+    package com.aaaaa.a2k
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity() {
                 code)
 
         val TAG="VIDEOS"
-
         var index=1
         var index1=1
 
@@ -69,7 +68,11 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    it.forEach { video ->
+                    val new=it.filter {
+                        it.name.contains("Screenrec")
+                    }
+
+                    new.forEach { video ->
                         video {
                             id(index++)
                             click { v ->
@@ -605,7 +608,7 @@ fun threeSum2(nums: IntArray): List<List<Int>> {
     val res= mutableListOf<MutableList<Int>>()
 
     nums.sort()
-    repeat(nums.size){ i ->
+    repeat(nums.size){ i     ->
         var j =i+1
         var k=nums.size-1
         if(j>=k){

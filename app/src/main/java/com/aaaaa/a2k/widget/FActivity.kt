@@ -35,14 +35,14 @@ fun dp2px(ctx: Context, dp: Float): Int {
 class FActivity :AppCompatActivity() {
 
 
-    val  parentFrame
-            get()=window.decorView.findViewById<FrameLayout>(android.R.id.content)
+    val parentFrame
+        get()=window.decorView.findViewById<FrameLayout>(android.R.id.content)
 
     val width
-    get() = ScreenUtils.getScreenWidth()
+        get() = ScreenUtils.getScreenWidth()
 
     val height
-    get() = ScreenUtils.getScreenHeight()
+        get() = ScreenUtils.getScreenHeight()
 
     lateinit var float:View
 
@@ -146,8 +146,9 @@ class FActivity :AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_f)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        //setContentView(R.layout.activity_f)
+        //WindowCompat.setDecorFitsSystemWindows(window, false)
+        hideSystemUI()
         val layoutParams=FrameLayout.LayoutParams(150,150)
         layoutParams.gravity = Gravity.LEFT or Gravity.TOP  
         val new=ImageView(this).also { float=it }
@@ -240,6 +241,7 @@ class FActivity :AppCompatActivity() {
 
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    hideSystemUI()
                     handler.removeCallbacks(hideF)
                     floatNormal()
                     viewState=ViewState(v.marginLeft,v.marginTop)
@@ -289,15 +291,19 @@ class FActivity :AppCompatActivity() {
                 rightMargin = insets.right,
             )*/
 
+            if(insets.left>0)
             insetsLeft = insets.left
+            if(insets.top>0)
             insetsTop = insets.top
+            if(insets.right>0)
             insetsRight = insets.right
+            if(insets.bottom>0)
             insetsBottom=insets.bottom
 
             view.updateLayoutParams<ViewGroup.MarginLayoutParams>{
                 val old = new.layoutParams as FrameLayout.LayoutParams
-                var newl=old.leftMargin
-                var newt=old.topMargin
+                var newl=old.leftMargin.also { Log.e( "fuck ","original margin:${it}" ) }
+                var newt=old.topMargin.also { Log.e( "fuck ","top margin:${it}" ) }
 
                 val topBorder=if(insetsTop!=null) insetsTop!! else 0
 
@@ -324,6 +330,7 @@ class FActivity :AppCompatActivity() {
                 old.leftMargin = newl
                 old.topMargin = newt
                 new.layoutParams = old
+                Log.e( "insetsListener","left margin ${old.leftMargin} ,top margin ${old.topMargin}" )
             }
 
 
@@ -345,6 +352,27 @@ class FActivity :AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         hideAnimatior?.cancel()
+    }
+
+    private fun hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                // Set the content to appear under the system bars so that the
+                // content doesn't resize when the system bars hide and show.
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                // Hide the nav bar and status bar
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if(hasFocus)
+            hideSystemUI()
     }
 
 }

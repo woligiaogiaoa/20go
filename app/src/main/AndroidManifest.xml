@@ -32,7 +32,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.20k">
         <activity android:name="com.aaaaa.a2k.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".TestRoomActivity" >
@@ -41,11 +45,7 @@
 
         </activity>
         <activity android:name=".widget.FActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
 
         </activity>
     </application>
