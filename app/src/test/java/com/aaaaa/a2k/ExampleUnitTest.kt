@@ -10,15 +10,242 @@ import kotlin.math.max
 import kotlin.math.sign
 
 /**
- * Example local unit test, which will execute on the development machine (host).
+ * Example local unit test, which will execute on the development machine (host)        .
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
 
 
+    fun numTrees(n: Int): Int {
+        val dp =IntArray(n+1)
+        dp[0]=1
+        for(i in 1..n){
+            for(j in 1..i){
+                dp[i] +=dp[j-1]* dp[i-j]
+            }
+        }
+        return dp[n]
+    }
+
+
+    fun integerBreak(n: Int): Int   {
+
+        fun max(a:Int,b:Int)=Math.max(a,b)
+
+        val dp=IntArray(n+1)
+
+        dp[2]=1
+        for(i in 3..n){
+            for(j in 1..i-1){
+                dp[i]=max(
+                    dp[i],
+                    max(j*(i-j), j*dp[i-j])
+                )
+            }
+        }
+        return dp[n]
+    }
+
+
+
+
+    /*输入: 10
+输出: 36
+解释: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36。*/
+    // n 2..58
+    // 1 2 3 4 5 6
+    fun integerBreak3(n: Int): Int{
+
+        fun max(a:Int, b:Int)=Math.max(a,b)
+
+        fun dp(a:Int):Int{
+            if(a==1)
+                return 1
+            if(a==2)
+                return 1
+
+            var max1= 1
+
+            for(i in 1..a-1){ //1..9
+
+                val op= i* a-i
+                val x =i * dp(a-i)
+                max1= max(max1,max(op,x))
+            }
+
+            return max1
+        }
+
+        return dp(n)
+    }
+
+    @Test
+    fun t1(){
+        println(integerBreak(10))
+        assertEquals(true,true)
+    }
+
+    fun integerBreak1(n: Int): Int {
+
+       /* dp[n] :int lists
+        dp[n] dp[n-1] dp[1] dp[n-2] + dp[2]*/
+        val dp = mutableListOf<MutableList<MutableList<Int>>>().apply {
+            repeat(n+1){
+                add(mutableListOf())
+            }
+        }
+        dp[2]= mutableListOf(mutableListOf(1,1)) //dp[1] +dp[1]
+        dp[1]= mutableListOf(mutableListOf(1))
+        //dp[3]={111},{1,2}
+        if(n<=2) return 1
+
+        for(i in 3..n){ //qiu dp[i] //for i
+            val resI= mutableListOf<MutableList<Int>>()
+            for(last in 1..i-1){
+                val res = mutableListOf<Int>().also{it.add(last)}
+                //concat
+                dp[i-last].forEach {
+                    //zucheng 5 suoyoushu
+                    //5+1
+                    val new: List<Int> =it + res
+                    resI.add( new.toMutableList())
+                }
+            }
+            dp[i] =resI
+        }
+
+        var max=0
+        dp[n].forEach {
+            var temp=1
+            it.forEach { candi ->
+                temp *= candi
+            }
+            max=Math.max(max,temp)
+        }
+        return  max
+    }
+
+    fun uniquePathsWithObstacles(obstacleGrid: Array<IntArray>): Int{
+        val m=obstacleGrid.size
+        val n=obstacleGrid[0].size
+        val dp= mutableListOf<IntArray>().apply {
+            repeat(m){
+                add(IntArray(n))
+            }
+        }
+        if(obstacleGrid[0][0]==1)
+            return 0
+
+            dp[0][0]=1
+            for(x in 0..m-1){
+            for(y in 0..n-1){
+                //index : x row
+                if(x==0 && y==0)
+                    continue
+                if(obstacleGrid[x][y]==1) {
+                    dp[x][y]=0
+                    continue
+                }
+
+                dp[x][y]=(   if(y-1>=0)  dp[x][y-1] else 0 ) +  (if(x-1>=0)  dp[x-1][y] else 0 )
+            }
+        }
+
+        return dp[m][n]
+
+    }
+
+    fun uniquePaths(m: Int, n: Int): Int {
+        //m-1 向下 n-1向右
+        //mn = m-1 n + m n-1
+    /*    dp[1,1]=1
+        dp[x][y]=dp[x][y-1] + dp[x-1][y]*/
+        val dp= mutableListOf<IntArray>().apply {
+            repeat(m){
+                add(IntArray(n))
+            }
+        }
+        dp[0][0]=1
+
+        for(x in 0..m-1){
+            for(y in 0..n-1){
+                //index : x row
+                if(x==0 && y==0)
+                    continue
+
+                dp[x][y]=( if(y-1>=0)  dp[x][y-1] else 0 ) +  (if(x-1>=0)  dp[x-1][y] else 0 )
+            }
+        }
+        dp.forEach {
+            println("${it.toList()}")
+        }
+            println(dp)
+        return dp[m-1][n-1]
+    }
+
+    @Test
+    fun testPath(){
+        uniquePaths(3,7)
+        assertEquals(true,true)
+    }
+
+    fun minCostClimbingStairs(cost: IntArray): Int {
+
+            fun min(a:Int,b:Int)=Math.min(a,b)
+
+            /*   dp[0]=0
+            dp[1] =0
+            dp[index] =dp[index-1]+cost[index-1]
+                    or dp[index-2] +cost[index-2]*/
+
+            val dp = IntArray(cost.size + 1)
+
+            dp[0]=0
+            dp[1]=0
+            for(i in 2..dp.size-1){
+                dp[i]= min(dp[i-1]+cost[i-1] ,
+                        dp[i-2]+cost[i-2]
+                )
+            }
+            return dp[dp.size-1]
+        }
+
+
+    fun climbStairs(n: Int): Int {
+
+        val dp=IntArray(n+1)
+        dp[0]=1
+
+        for(i in 1..n){
+            dp[i]= (  dp[i-1]  ) +
+                    ( if(i-2>=0) dp[i-2] else  0   )
+        }
+        return dp[n]
+    }
+
+    fun fib(n: Int): Int {
+        //return if(n<=1) n else fib(n-1)+fib(n-2)
+        /*---------------diver----------- */
+        val res = IntArray(n+1)
+        if(n<=1){
+            return n
+        }
+        res[0]=0
+        res[1]=1
+
+        for(i in 2..n){
+            res[i]=res[i-1] +res[i-2]
+        }
+        return res[n]
+    }
+
+
+
+
+
     // 0 1 2 无覆盖 有摄像头 有覆盖
-    fun minCameraCover(root: TreeNode?): Int {
+        fun minCameraCover(root: TreeNode?): Int {
 
         root?: return 0
 
@@ -147,7 +374,7 @@ int maxProfit(vector<int>& prices, int fee) {
     }
     return result;
 }
-};*/        fun maxProfit1(prices: IntArray, fee: Int): Int  {
+};*/         fun maxProfit1(prices: IntArray, fee: Int): Int  {
         //found increase blocks
 
         if (prices.size <= 1) {
@@ -236,6 +463,7 @@ int maxProfit(vector<int>& prices, int fee) {
         }
 
         return String(data).toInt()
+
 
     }
 

@@ -33,7 +33,7 @@ public class MediaUtils {
         return saveFile(context, file, uri);
     }
 
-    private static boolean saveFile(Context context, File file, Uri uri) {
+    private static boolean saveFile(Context context, File file, Uri uri)    {
         if (uri == null) {
             return false;
         }
@@ -111,5 +111,5 @@ public class MediaUtils {
         return uri;
     }
 
-
 }
+//compose 发布和view的互操作性，替换复杂实现

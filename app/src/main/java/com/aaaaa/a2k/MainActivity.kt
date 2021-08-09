@@ -1,4 +1,4 @@
-    package com.aaaaa.a2k
+package com.aaaaa.a2k
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -27,9 +27,25 @@ import java.lang.StringBuilder
 import java.util.*
 
 
+/*for(int i = 0; i < weight.size(); i++) { // 遍历物品
+    for(int j = bagWeight; j >= weight[i]; j--) { // 遍历背包容量
+        dp[j] = max(dp[j], dp[j - weight[i]] + value[i]); dp[9]=value....... dp[4]=value
+        //dp[5]+value1
+    }
+}*/
+
+//dp[4  ]=value dp[5]=value+dp[1]
+
+/*const char *vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";*/
+
 class MainActivity : AppCompatActivity() {
 
-    val code=213
+    val code = 213
 
     /*   1
     * ----------    = (e -z)` *
@@ -39,36 +55,36 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding:ActivityMainBinding=DataBindingUtil.setContentView(this,R.layout.activity_main)
+        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
 
         requestPermissions(
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.MANAGE_EXTERNAL_STORAGE),
+                        Manifest.permission.MANAGE_EXTERNAL_STORAGE),
                 code)
 
-        val TAG="VIDEOS"
-        var index=1
-        var index1=1
+        val TAG = "VIDEOS"
+        var index = 1
+        var index1 = 1
 
-        val lock=Any()
+        val lock = Any()
 
         videos.observeForever {
-            synchronized(lock) {
+            synchronized(lock)  {
 
                 //findViewById<EpoxyRecyclerView>(R.id.rv).layoutManager= LinearLayoutManager(this)
                 binding.rv.withModels {
 
                     testdb {
                         id("testdb")
-                        click {  _ ->
+                        click { _ ->
                             //todo :test db
                             getPackageName()
 
                         }
                     }
 
-                    val new=it.filter {
+                    val new = it.filter {
                         it.name.contains("Screenrec")
                     }
 
@@ -78,23 +94,21 @@ class MainActivity : AppCompatActivity() {
                             click { v ->
                                 val name = getVideoFormatName(video.data).also {
                                     Log.e(
-                                        TAG,
-                                        "video format${it}",
+                                            TAG,
+                                            "video format${it}",
                                     )
                                 }
-
                                 //showToast(name)
-
                                 GlobalScope.launch((Dispatchers.Default)) {
 
                                     val bitmap =
-                                        Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
+                                            Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
                                     if (showVideoPreview(video.data.also {
-                                            Log.e(TAG, "videoFileUrl${it}")
-                                        }, bitmap)) {
-                                            runOnUiThread {
-                                                showToast("true")
-                                            }
+                                                Log.e(TAG, "videoFileUrl${it}")
+                                            }, bitmap)) {
+                                        runOnUiThread {
+                                            showToast("true")
+                                        }
 
                                         withContext(Dispatchers.Main) {
                                             binding.iv.setImageBitmap(bitmap).also {
@@ -102,8 +116,7 @@ class MainActivity : AppCompatActivity() {
                                                 saveImageToGallery(this@MainActivity, bitmap);
                                             }
                                         }
-                                    }
-                                    else{
+                                    } else {
                                         runOnUiThread {
                                             showToast("false")
                                         }
@@ -124,16 +137,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun a(){
-        val a =PriorityQueue<Int>(100){ i: Int, i1: Int ->
-            i-i1
+    fun a() {
+        val a = PriorityQueue<Int>(100) { i: Int, i1: Int ->
+            i - i1
         }
         a.poll()
     }
 
-    val handler= Handler(Looper.getMainLooper())
+    val handler = Handler(Looper.getMainLooper())
 
-    fun Context.showToast(data:String)=Toast.makeText(this,data,Toast.LENGTH_SHORT).show()
+    fun Context.showToast(data: String) = Toast.makeText(this, data, Toast.LENGTH_SHORT).show()
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
@@ -141,9 +154,9 @@ class MainActivity : AppCompatActivity() {
      */
     external fun stringFromJNI(): String
 
-    external fun getVideoFormatName(path:String):String
+    external fun getVideoFormatName(path: String): String
 
-    external fun showVideoPreview(path:String,bitmap: Bitmap):Boolean
+    external fun showVideoPreview(path: String, bitmap: Bitmap): Boolean
 
     @SuppressLint("NewApi")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -170,12 +183,10 @@ class MainActivity : AppCompatActivity() {
                             //跳转新页面申请权限
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION), 438)
                             //root previllage
-                        }
-                        else{
+                        } else {
                             getVideos()
                         }
-                    }
-                    else{
+                    } else {
                         GlobalScope.launch(Dispatchers.IO) {
                             getVideos()
                         }
@@ -200,7 +211,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         // Used to load the 'native-lib' library on application startup.
-        init    {
+        init {
             // avutil avformat avcodec swscale avdevice avfilter swresample
             System.loadLibrary("native-lib")
             System.loadLibrary("avutil")
@@ -227,9 +238,9 @@ class MainActivity : AppCompatActivity() {
     val videoList = mutableListOf<Video>()
 
 
-    val videos=MutableLiveData<List<Video>>()
+    val videos = MutableLiveData<List<Video>>()
 
-    fun getVideos(){
+    fun getVideos() {
 
 
         val collection: Uri =
@@ -294,7 +305,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Stores column values and the contentUri in a local object
                 // that represents the media file.
-                videoList += Video(contentUri, name,data, duration, size)
+                videoList += Video(contentUri, name, data, duration, size)
             }
 
             videos.postValue((videoList))
@@ -306,16 +317,16 @@ class MainActivity : AppCompatActivity() {
 //aabaafa
 //aaf
 fun strStr(haystack: String, needle: String): Int {
-    if(needle.isEmpty()) return 0
+    if (needle.isEmpty()) return 0
     //        end
-    if(haystack.length<needle.length) return -1
+    if (haystack.length < needle.length) return -1
 
 
-    val endIndex=haystack.length-1
-    val last=endIndex-(needle.length-1)
+    val endIndex = haystack.length - 1
+    val last = endIndex - (needle.length - 1)
 
-    for(i in 0..last){
-        if(haystack.substring(i,i+needle.length).equals(needle))
+    for (i in 0..last) {
+        if (haystack.substring(i, i + needle.length).equals(needle))
             return i
     }
 
@@ -323,10 +334,10 @@ fun strStr(haystack: String, needle: String): Int {
 }
 
 fun reverseLeftWords(s: String, n: Int): String {
-    fun reverse(array:CharArray,head:Int,end:Int){
-        var l=head
-        var r=end
-        while(l<r) {
+    fun reverse(array: CharArray, head: Int, end: Int) {
+        var l = head
+        var r = end
+        while (l < r) {
             val j = array[r]
             array[r] = array[l]
             array[l] = j
@@ -335,19 +346,19 @@ fun reverseLeftWords(s: String, n: Int): String {
         }
     }
 
-    var data=s.toCharArray()
-    reverse(data,0,n-1)
-    reverse(data,0,data.size-1)
-    reverse(data,0,data.size-n-1)
+    var data = s.toCharArray()
+    reverse(data, 0, n - 1)
+    reverse(data, 0, data.size - 1)
+    reverse(data, 0, data.size - n - 1)
     return String(data)
 }
 
 // 输入: s = "abcdefg", k = 2 输出: "cdefgab" //bacdefg
 
-fun reverse(array:CharArray,head:Int,end:Int){
-    var l=head
-    var r=end
-    while(l<r) {
+fun reverse(array: CharArray, head: Int, end: Int) {
+    var l = head
+    var r = end
+    while (l < r) {
         val j = array[r]
         array[r] = array[l]
         array[l] = j
@@ -359,11 +370,11 @@ fun reverse(array:CharArray,head:Int,end:Int){
 fun reverseWords(s: String): String {
 
 
-    var l=0
-    var r=s.length-1
+    var l = 0
+    var r = s.length - 1
 
-    var array=s.toCharArray()
-    while(l<r) {
+    var array = s.toCharArray()
+    while (l < r) {
         val j = array[r]
         array[r] = array[l]
         array[l] = j
@@ -371,27 +382,26 @@ fun reverseWords(s: String): String {
         r--
     }
 
-    val builder=StringBuilder()
+    val builder = StringBuilder()
     //   weqwew qwewqew qwewqe  qwe qwe qwe
 
 
+    var head = 0
 
-    var head=0
-
-    while(head<=array.size-1){
-        while(head<=array.size-1 && array[head]==' '){
+    while (head <= array.size - 1) {
+        while (head <= array.size - 1 && array[head] == ' ') {
             head++
         }
-        if(head>array.size-1)
+        if (head > array.size - 1)
             break
 
-        var end=head
-        while(end+1<array.size && array[end+1]!=' '){
+        var end = head
+        while (end + 1 < array.size && array[end + 1] != ' ') {
             end++
         }
-        reverse(array,head,end)
-        builder.append(" "+ String(array,head,end-head+1))
-        head=end
+        reverse(array, head, end)
+        builder.append(" " + String(array, head, end - head + 1))
+        head = end
         head++
     }
     return builder.toString().trim()
@@ -399,32 +409,31 @@ fun reverseWords(s: String): String {
 
 fun replaceSpace(s: String): String {
     // " " to "%20"
-    s.replace(" ","%20",true)
-    val chars: Array<Char> = Array(s.length*3){
+    s.replace(" ", "%20", true)
+    val chars: Array<Char> = Array(s.length * 3) {
         ' '
     }
-    var idex=0
+    var idex = 0
     s.forEach {
-        if(it==' '){
-            chars[idex++]='%'
-            chars[idex++]='2'
-            chars[idex++]='0'
-        }else{
-            chars[idex++]=it
+        if (it == ' ') {
+            chars[idex++] = '%'
+            chars[idex++] = '2'
+            chars[idex++] = '0'
+        } else {
+            chars[idex++] = it
         }
     }
 
-    return String(chars.toCharArray()).substring(0,idex)
+    return String(chars.toCharArray()).substring(0, idex)
 }
 
 
-val TAG=""
-
+val TAG = ""
 
 
 fun reverseString(s: CharArray): Unit {
-    var i =0
-    var j =s.size-1
+    var i = 0
+    var j = s.size - 1
 }
 
 
@@ -518,15 +527,15 @@ Line 53: Char 18: error: unresolved reference: k
 
 fun reverseStr(s: String, k: Int): String {
 
-    fun reverseIJ(s:String,i1 :Int,j1:Int):String{
-        var s1=s.toCharArray()
-        var i =i1
-        var j =j1
-        while(i<j){
+    fun reverseIJ(s: String, i1: Int, j1: Int): String {
+        var s1 = s.toCharArray()
+        var i = i1
+        var j = j1
+        while (i < j) {
 
-            var jchar=s1[j]
-            s1[j]=s1[i]
-            s1[i]=jchar
+            var jchar = s1[j]
+            s1[j] = s1[i]
+            s1[i] = jchar
 
             i++
             j--
@@ -536,20 +545,20 @@ fun reverseStr(s: String, k: Int): String {
     }
 
 
-    var res: String =s
+    var res: String = s
 
-    var index=0
+    var index = 0
 
-    while(index< res.length){
+    while (index < res.length) {
         //index...index+k-1
 
-            //12121123213213
+        //12121123213213
 
-        var end=index+k-1
-        var start=index
-        if(end>res.length-1) end=res.length-1
-        res=reverseIJ(res,start,end)
-        index += 2*k
+        var end = index + k - 1
+        var start = index
+        if (end > res.length - 1) end = res.length - 1
+        res = reverseIJ(res, start, end)
+        index += 2 * k
     }
 
     return res
@@ -559,35 +568,35 @@ fun reverseStr(s: String, k: Int): String {
 fun fourSum(nums: IntArray, target: Int): List<List<Int>> {
     if (nums.size < 4) return emptyList()
     nums.sort()
-    val resSet= mutableSetOf<MutableList<Int>>()
-    val res= mutableListOf<MutableList<Int>>()
-    repeat(nums.size){ i ->
-       for(j in i+1..nums.size-1){
-           var k=j+1
-           var q=nums.size-1
-           if(k>=q) break
-           while(k!=q){
-               val sum =nums[i]+nums[j]+nums[k]+nums[q]
-               if(sum==target){
-                   val new= mutableListOf<Int>().apply {
-                       add(nums[i])
-                       add(nums[j])
-                       add(nums[k])
-                       add(nums[q])
-                   }
-                   new.sort()
-                   if(!resSet.contains(new)){
-                       resSet.add(new)
-                       res.add(new)
-                   }
-                   k++
-               }else if(sum>target){
-                   q--
-               }else{
-                   k++
-               }
-           }
-       }
+    val resSet = mutableSetOf<MutableList<Int>>()
+    val res = mutableListOf<MutableList<Int>>()
+    repeat(nums.size) { i ->
+        for (j in i + 1..nums.size - 1) {
+            var k = j + 1
+            var q = nums.size - 1
+            if (k >= q) break
+            while (k != q) {
+                val sum = nums[i] + nums[j] + nums[k] + nums[q]
+                if (sum == target) {
+                    val new = mutableListOf<Int>().apply {
+                        add(nums[i])
+                        add(nums[j])
+                        add(nums[k])
+                        add(nums[q])
+                    }
+                    new.sort()
+                    if (!resSet.contains(new)) {
+                        resSet.add(new)
+                        res.add(new)
+                    }
+                    k++
+                } else if (sum > target) {
+                    q--
+                } else {
+                    k++
+                }
+            }
+        }
     }
     return res
 }
@@ -603,34 +612,34 @@ fun threeSum2(nums: IntArray): List<List<Int>> {
 
     if (nums.size < 3) return emptyList()
 
-    val resSet= mutableSetOf<MutableList<Int>>()
+    val resSet = mutableSetOf<MutableList<Int>>()
 
-    val res= mutableListOf<MutableList<Int>>()
+    val res = mutableListOf<MutableList<Int>>()
 
     nums.sort()
-    repeat(nums.size){ i     ->
-        var j =i+1
-        var k=nums.size-1
-        if(j>=k){
+    repeat(nums.size) { i ->
+        var j = i + 1
+        var k = nums.size - 1
+        if (j >= k) {
             return@repeat
         }
-        while(j!=k){
-            val sum=nums[i]+nums[j]+nums[k]
-            if(sum==0){
-               val new= mutableListOf<Int>().apply {
-                   add(nums[i])
-                   add(nums[j])
-                   add(nums[k])
-               }
+        while (j != k) {
+            val sum = nums[i] + nums[j] + nums[k]
+            if (sum == 0) {
+                val new = mutableListOf<Int>().apply {
+                    add(nums[i])
+                    add(nums[j])
+                    add(nums[k])
+                }
                 new.sort()
-                if(!resSet.contains(new)){
+                if (!resSet.contains(new)) {
                     resSet.add(new)
                     res.add(new)
                 }
                 j++
-            }else if(sum>0){
+            } else if (sum > 0) {
                 k--
-            }else{
+            } else {
                 j++
             }
         }
@@ -642,20 +651,20 @@ fun threeSum1(nums: IntArray): List<List<Int>> {
 
     if (nums.size < 3) return emptyList()
 
-    val resSet= mutableSetOf<MutableList<Int>>()
-    val res= mutableListOf<MutableList<Int>>()
+    val resSet = mutableSetOf<MutableList<Int>>()
+    val res = mutableListOf<MutableList<Int>>()
 
     repeat(nums.size) { i ->
         for (j in i + 1..nums.size - 1) {
-            for(k in j+1..nums.size-1){
-                if(nums[i]+nums[j]+nums[k]==0){
-                    val new=mutableListOf<Int>().apply {
+            for (k in j + 1..nums.size - 1) {
+                if (nums[i] + nums[j] + nums[k] == 0) {
+                    val new = mutableListOf<Int>().apply {
                         add(nums[i])
                         add(nums[j])
                         add(nums[k])
                     }
                     new.sort()
-                    if(!resSet.contains(new)){
+                    if (!resSet.contains(new)) {
                         resSet.add(new)
                         res.add(new)
                     }
@@ -664,7 +673,7 @@ fun threeSum1(nums: IntArray): List<List<Int>> {
         }
     }
 
-    return  res
+    return res
 }
 
 
@@ -682,14 +691,14 @@ fun threeSum(nums: IntArray): List<List<Int>> {
 
     repeat(nums.size) { i ->
         for (j in i + 1..nums.size - 1) {
-                indexSumMap[Pair(i, j)] = nums[i] + nums[j]
+            indexSumMap[Pair(i, j)] = nums[i] + nums[j]
         }
     }
     val res = mutableListOf<MutableList<Int>>()
 
-    val listSet= mutableSetOf<MutableList<Int>>()
+    val listSet = mutableSetOf<MutableList<Int>>()
 
-    val resSet= mutableSetOf<MutableList<Int>>()
+    val resSet = mutableSetOf<MutableList<Int>>()
 
     for (mutableEntry in indexSumMap) {
         val sum12 = mutableEntry.value
@@ -701,26 +710,26 @@ fun threeSum(nums: IntArray): List<List<Int>> {
 
                 if (indexa != mutableEntry.key.first && indexa != mutableEntry.key.second) {
 
-                        val sortList= mutableListOf<Int>()
-                        sortList.add(indexa)
-                        sortList.add(mutableEntry.key.first)
-                        sortList.add(mutableEntry.key.second)
-                        sortList.sort()
-                        if(!listSet.contains(sortList)){
-                            listSet.add(sortList)
-                            Log.e(TAG, "threeSum:${sortList} in ${listSet} " )
-                            val new=mutableListOf<Int>().apply {
-                                add(nums[indexa])
-                                add(nums[mutableEntry.key.first])
-                                add(nums[mutableEntry.key.second])
-                            }
-                            new.sort()
-
-                            if(!resSet.contains(new)){
-                                resSet.add(new)
-                                res.add(new)
-                            }
+                    val sortList = mutableListOf<Int>()
+                    sortList.add(indexa)
+                    sortList.add(mutableEntry.key.first)
+                    sortList.add(mutableEntry.key.second)
+                    sortList.sort()
+                    if (!listSet.contains(sortList)) {
+                        listSet.add(sortList)
+                        Log.e(TAG, "threeSum:${sortList} in ${listSet} ")
+                        val new = mutableListOf<Int>().apply {
+                            add(nums[indexa])
+                            add(nums[mutableEntry.key.first])
+                            add(nums[mutableEntry.key.second])
                         }
+                        new.sort()
+
+                        if (!resSet.contains(new)) {
+                            resSet.add(new)
+                            res.add(new)
+                        }
+                    }
                 }
             }
             indexa++
@@ -732,63 +741,61 @@ fun threeSum(nums: IntArray): List<List<Int>> {
 fun canConstruct(ransomNote: String, magazine: String): Boolean {
 
 
-    val datasMap=IntArray(26){0}
+    val datasMap = IntArray(26) { 0 }
 
     magazine.forEach {
-        val index=it-'a'
+        val index = it - 'a'
         datasMap[index]++
     }
     ransomNote.forEach {
-        datasMap[it-'a']--
-        if(datasMap[it-'a']<0)
+        datasMap[it - 'a']--
+        if (datasMap[it - 'a'] < 0)
             return false
     }
     return true
 }
 
 
-
-
 //digema
 fun intersection(nums1: IntArray, nums2: IntArray): IntArray {
 
-    if(nums1.size==0 || nums2.size==0)
+    if (nums1.size == 0 || nums2.size == 0)
         return emptyArray<Int>().toIntArray()
 
-    val set1= mutableSetOf<Int>()
-    val set2= mutableSetOf<Int>()
+    val set1 = mutableSetOf<Int>()
+    val set2 = mutableSetOf<Int>()
 
     nums1.forEach {
         set1.add(it)
     }
     nums2.forEach {
-        if(set1.contains(it))
-        set2.add(it)
+        if (set1.contains(it))
+            set2.add(it)
     }
 
     val res = arrayListOf<Int>()
 
-    var index=0
+    var index = 0
     set2.forEach {
-        res.add(index++,it)
+        res.add(index++, it)
     }
 
-    return  res.toIntArray()
+    return res.toIntArray()
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
 fun isAnagram(s: String, t: String): Boolean {
 
-    if(s.length!=t.length) return false
-    val map= mutableMapOf<Char,Int>()
+    if (s.length != t.length) return false
+    val map = mutableMapOf<Char, Int>()
     s.forEach {
-        var num=map.getOrDefault(it,0)
-        map[it]=++num
+        var num = map.getOrDefault(it, 0)
+        map[it] = ++num
     }
     t.forEach {
-        var num=map.getOrDefault(it,0)
-        map[it]=--num
-        if(map[it]!!<=-1){
+        var num = map.getOrDefault(it, 0)
+        map[it] = --num
+        if (map[it]!! <= -1) {
             return false
         }
     }
@@ -799,19 +806,19 @@ fun isAnagram(s: String, t: String): Boolean {
 //2x +2 y = x+ y + n (y +z)
 //x + y =n(y+z)
 fun detectCycle(head: ListNode?): ListNode? {
-    var slow=head
-    var fast=head
-    while(slow?.next!=null && fast?.next!=null){
-        slow=slow.next
-        fast= fast.next!!.next
-        if(fast!=null && slow===fast){
-            var go=head
-            var go1 =fast
-            while(!(go===go1)){
-                go=go!!.next
-                go1=go1!!.next
+    var slow = head
+    var fast = head
+    while (slow?.next != null && fast?.next != null) {
+        slow = slow.next
+        fast = fast.next!!.next
+        if (fast != null && slow === fast) {
+            var go = head
+            var go1 = fast
+            while (!(go === go1)) {
+                go = go!!.next
+                go1 = go1!!.next
             }
-            return  go
+            return go
         }
     }
 
@@ -823,42 +830,42 @@ fun swapPairs(head: ListNode?): ListNode? {
 
     head ?: return head
 
-    var first: ListNode? =ListNode(-1)
-    var second: ListNode? =ListNode(-1)
-    first!!.next=second
-    second!!.next=head
+    var first: ListNode? = ListNode(-1)
+    var second: ListNode? = ListNode(-1)
+    first!!.next = second
+    second!!.next = head
 
-    var newHead: ListNode? =null
+    var newHead: ListNode? = null
 
-    while(second!!.next!=null && second.next!!.next!=null){
-        first=second.next
-        second=second!!.next!!.next
+    while (second!!.next != null && second.next!!.next != null) {
+        first = second.next
+        second = second!!.next!!.next
 
-        val pairTailNext=second!!.next
+        val pairTailNext = second!!.next
 
-        second.next=first
-        first!!.next=pairTailNext
+        second.next = first
+        first!!.next = pairTailNext
 
-        val newSecond=first
-        first=second
-        second=newSecond
-        if(newHead==null){
-            newHead=first
+        val newSecond = first
+        first = second
+        second = newSecond
+        if (newHead == null) {
+            newHead = first
         }
     }
-    return if(newHead==null) head else newHead
+    return if (newHead == null) head else newHead
 
 }
 
 
 fun reverseList(head: ListNode?): ListNode? {
-    var curr: ListNode? =head
-    var pre: ListNode? =null
-    while(curr!=null){
-        val next=curr.next
-        curr.next=pre
-        pre=curr
-        curr=next
+    var curr: ListNode? = head
+    var pre: ListNode? = null
+    while (curr != null) {
+        val next = curr.next
+        curr.next = pre
+        pre = curr
+        curr = next
     }
     return pre
 }
@@ -866,31 +873,31 @@ fun reverseList(head: ListNode?): ListNode? {
 
 fun fourSumCount(nums1: IntArray, nums2: IntArray, nums3: IntArray, nums4: IntArray): Int {
 
-    val sum12times= mutableMapOf<Int,Int>()
-    val sum34times= mutableMapOf<Int,Int>()
+    val sum12times = mutableMapOf<Int, Int>()
+    val sum34times = mutableMapOf<Int, Int>()
 
-    var num=0
+    var num = 0
 
 
-    nums1.forEach {  a ->
-        nums2.forEach {  b ->
-            if(sum12times[a+b]==null)
-                sum12times[a+b]=0
-           sum12times[a+b] = sum12times[a+b]!! + 1
+    nums1.forEach { a ->
+        nums2.forEach { b ->
+            if (sum12times[a + b] == null)
+                sum12times[a + b] = 0
+            sum12times[a + b] = sum12times[a + b]!! + 1
         }
     }
 
-    nums3.forEach {  a ->
-        nums4.forEach {  b ->
-            if(sum34times[a+b]==null)
-                sum34times[a+b]=0
-            sum34times[a+b] = sum34times[a+b]!! + 1
+    nums3.forEach { a ->
+        nums4.forEach { b ->
+            if (sum34times[a + b] == null)
+                sum34times[a + b] = 0
+            sum34times[a + b] = sum34times[a + b]!! + 1
         }
     }
 
     for (sum12time in sum12times) {
-        if(sum34times.containsKey(-1*sum12time.key)){
-            num += sum12time.value * sum34times[-1*sum12time.key]!!
+        if (sum34times.containsKey(-1 * sum12time.key)) {
+            num += sum12time.value * sum34times[-1 * sum12time.key]!!
         }
     }
     return num
@@ -913,7 +920,7 @@ class MyLinkedList() {
 
     var length = 0
 
-    class Node(var `val`: Int ,
+    class Node(var `val`: Int,
                var next: Node? = null)
 
     /** Get the value of the index-th node in the linked list. If the index is invalid, return -1. */
@@ -1047,29 +1054,28 @@ class MyLinkedList() {
 
 
 class ListNode(var `val`: Int) {
-         var next: ListNode?=null
-     }
+    var next: ListNode? = null
+}
 
 fun removeElements(head: ListNode?, `val`: Int): ListNode? {
 
-    var virtualHead:ListNode?=ListNode(-1).apply {
+    var virtualHead: ListNode? = ListNode(-1).apply {
         next = head
     }
-    val rememberVirtual: ListNode =virtualHead!!
+    val rememberVirtual: ListNode = virtualHead!!
 
-    while(virtualHead!!.next!=null){
+    while (virtualHead!!.next != null) {
 
-        var node: ListNode? =virtualHead.next!!    //1
-                                                   //2
-                                                   //3
+        var node: ListNode? = virtualHead.next!!    //1
+        //2
+        //3
         node.also {                                //4
-            if(node!!.`val`==`val`){
-                val next: ListNode? =node!!.next
-                virtualHead!!.next=next
-                node=null
-            }
-            else{
-                virtualHead=virtualHead!!.next!!
+            if (node!!.`val` == `val`) {
+                val next: ListNode? = node!!.next
+                virtualHead!!.next = next
+                node = null
+            } else {
+                virtualHead = virtualHead!!.next!!
             }
         }
     }
@@ -1116,55 +1122,53 @@ class Solutions {
      */
 
 
-
-
     fun generateMatrix(n: Int): Array<IntArray> {
 
         val matrix =
-            mutableListOf<IntArray>().apply {
-                repeat(n) {
-                    add(mutableListOf<Int>().apply {
-                        repeat(n){
-                            add(0)
-                        }
-                    }.toIntArray())
+                mutableListOf<IntArray>().apply {
+                    repeat(n) {
+                        add(mutableListOf<Int>().apply {
+                            repeat(n) {
+                                add(0)
+                            }
+                        }.toIntArray())
+                    }
                 }
-            }
 
-        var loop = n/2
+        var loop = n / 2
 
-        if(n % 2 >0) loop++
+        if (n % 2 > 0) loop++
 
-        var start=0
+        var start = 0
 
-        var data=1
+        var data = 1
 
-        while(loop -- > 0){
-            for(i in start..n-1-start){
+        while (loop-- > 0) {
+            for (i in start..n - 1 - start) {
                 //first loop
-                matrix[start][i]=data++
+                matrix[start][i] = data++
 
             }
 
-            if(start <n-1-start)
-            for(i in start+1..n-1-start){
-                matrix[i][n-1-start]=data++
-            }
+            if (start < n - 1 - start)
+                for (i in start + 1..n - 1 - start) {
+                    matrix[i][n - 1 - start] = data++
+                }
 
-            if(start <n-1-start)
-            for(i in n-1-start-1 downTo start step 1){
-                matrix[n-1-start][i]=data++
-            }
+            if (start < n - 1 - start)
+                for (i in n - 1 - start - 1 downTo start step 1) {
+                    matrix[n - 1 - start][i] = data++
+                }
 
-            if(start <n-1-start-1)
-                for(i in n-1-start-1 downTo start+1 step 1){
-                    matrix[i][start]=data++
+            if (start < n - 1 - start - 1)
+                for (i in n - 1 - start - 1 downTo start + 1 step 1) {
+                    matrix[i][start] = data++
                 }
             start++
         }
 
-        return  mutableListOf<IntArray>().apply {
-            repeat(n){
+        return mutableListOf<IntArray>().apply {
+            repeat(n) {
                 add(matrix[it])
             }
         }.toTypedArray()
@@ -1174,55 +1178,55 @@ class Solutions {
 
     fun removeElements1(nums: IntArray, `val`: Int): Int {
 
-        var  idle=-1
-        repeat(nums.size){ index ->
-            if(nums[index]!=`val`){
-                nums[++idle]=nums[index]
+        var idle = -1
+        repeat(nums.size) { index ->
+            if (nums[index] != `val`) {
+                nums[++idle] = nums[index]
             }
         }
-        return idle+1
+        return idle + 1
     }
 
     fun minSubArrayLen1(target: Int, nums: IntArray): Int {
 
-        var find=false
-        var minLength=Int.MAX_VALUE
-        repeat(nums.size){ startIndex ->
+        var find = false
+        var minLength = Int.MAX_VALUE
+        repeat(nums.size) { startIndex ->
 
-            var sum=0
-            for ( i in startIndex..nums.size-1){
-                sum +=nums[i]
-                if(sum>=target){
-                    val res=i-startIndex+1
-                    minLength= kotlin.math.min(minLength,res)
-                    find=true
+            var sum = 0
+            for (i in startIndex..nums.size - 1) {
+                sum += nums[i]
+                if (sum >= target) {
+                    val res = i - startIndex + 1
+                    minLength = kotlin.math.min(minLength, res)
+                    find = true
                     break
                 }
             }
         }
 
-        return if(!find) 0 else{
+        return if (!find) 0 else {
             minLength
         }
     }
 
     fun twoSum(nums: IntArray, target: Int): IntArray {
 
-        val map= mutableMapOf<Int,Int>()
+        val map = mutableMapOf<Int, Int>()
 
-        var  index=0
+        var index = 0
         nums.forEach {
-            map.put(it,index++)
+            map.put(it, index++)
         }
 
-        var index1 =0
-        nums.forEach {  candidate ->
-            if(map.contains(target-candidate)){
-                val b =map[target-candidate]!!
-                if(b !=index1)
-                return IntArray(2){ resIndex ->
-                    if(resIndex==0) index1 else b
-                }
+        var index1 = 0
+        nums.forEach { candidate ->
+            if (map.contains(target - candidate)) {
+                val b = map[target - candidate]!!
+                if (b != index1)
+                    return IntArray(2) { resIndex ->
+                        if (resIndex == 0) index1 else b
+                    }
             }
 
             index1++
@@ -1232,12 +1236,12 @@ class Solutions {
     }
 
     fun twoSum1(nums: IntArray, target: Int): IntArray {
-        repeat(nums.size){ i ->
+        repeat(nums.size) { i ->
 
-            for(j in i+1..nums.size-1){
-                if(nums[i]+nums[j]==target)
-                    return IntArray(2){ index ->
-                        if(index==0) i else j
+            for (j in i + 1..nums.size - 1) {
+                if (nums[i] + nums[j] == target)
+                    return IntArray(2) { index ->
+                        if (index == 0) i else j
                     }
             }
         }
@@ -1246,32 +1250,32 @@ class Solutions {
 
     fun isHappy(n: Int): Boolean {
 
-        if(n==0) return false
+        if (n == 0) return false
 
-        fun getNext(n:Int): Int {
-            var now=n
-            var res =0
-            while(now>0){
-                val temp=now%10
-                res+= temp * temp
-                now =now /10
+        fun getNext(n: Int): Int {
+            var now = n
+            var res = 0
+            while (now > 0) {
+                val temp = now % 10
+                res += temp * temp
+                now = now / 10
             }
             return res
         }
 
-        val set= mutableSetOf<Int>()
+        val set = mutableSetOf<Int>()
 
-        var now=n.also {
+        var now = n.also {
             set.add(it)
         }
 
-        while(now!=1){
+        while (now != 1) {
 
-            now=getNext(now)
-            if(now==1) {
+            now = getNext(now)
+            if (now == 1) {
                 return true
-            }else{
-                if(set.contains(now)) return false
+            } else {
+                if (set.contains(now)) return false
                 set.add(now)
             }
         }
@@ -1292,22 +1296,22 @@ class Solutions {
         }*/
 
     fun minSubArrayLen(target: Int, nums: IntArray): Int {
-            var start=0
-            var end=0
-            var min=Int.MAX_VALUE
-            var sum=0
-            while(end <=nums.size-1){
-                sum+=nums[end]
-                while(sum>=target){
-                    val length= end-start+1
-                    min=kotlin.math.min(min,length)
-                    sum-=nums[start]
-                    start++
-                }
-                //finally
-                end++
+        var start = 0
+        var end = 0
+        var min = Int.MAX_VALUE
+        var sum = 0
+        while (end <= nums.size - 1) {
+            sum += nums[end]
+            while (sum >= target) {
+                val length = end - start + 1
+                min = kotlin.math.min(min, length)
+                sum -= nums[start]
+                start++
             }
-            return if(min== Int.MAX_VALUE) 0 else min
+            //finally
+            end++
+        }
+        return if (min == Int.MAX_VALUE) 0 else min
     }
 
 /*
@@ -1345,44 +1349,44 @@ class Solutions {
     }*/
 
 
-        //[-1,0,3,5,9,12] size:6
-        //9
+    //[-1,0,3,5,9,12] size:6
+    //9
 
-        // no repeat valid data set
-        /* fun search2(nums: IntArray, target: Int): Int {
-        if(target<nums[0] || target>nums[nums.size-1]) return  -1
+    // no repeat valid data set
+    /* fun search2(nums: IntArray, target: Int): Int {
+    if(target<nums[0] || target>nums[nums.size-1]) return  -1
 
-        if(nums.size==1 && target==nums[0]) return 0
+    if(nums.size==1 && target==nums[0]) return 0
 
-        if(nums.size==2){
-            return if(nums[0]==target) 0 else if(nums[1]==target) 1 else -1
-        }
-
-        //nums>3
-        val splitIndex=nums.size/2
-
-        if(nums[splitIndex]==target) return splitIndex
-
-        if(nums[splitIndex]>target){
-            return search(mutableListOf<Int>().run {
-                 repeat(splitIndex){ index ->
-                     add(nums[index])
-                 }
-                 toIntArray()
-            },target)
-        }
-        else{
-            return search(mutableListOf<Int>().run {
-                for(i in splitIndex..nums.size-1){
-                    add(nums[i])
-                }
-                toIntArray()
-            },target)
-        }
+    if(nums.size==2){
+        return if(nums[0]==target) 0 else if(nums[1]==target) 1 else -1
     }
+
+    //nums>3
+    val splitIndex=nums.size/2
+
+    if(nums[splitIndex]==target) return splitIndex
+
+    if(nums[splitIndex]>target){
+        return search(mutableListOf<Int>().run {
+             repeat(splitIndex){ index ->
+                 add(nums[index])
+             }
+             toIntArray()
+        },target)
+    }
+    else{
+        return search(mutableListOf<Int>().run {
+            for(i in splitIndex..nums.size-1){
+                add(nums[i])
+            }
+            toIntArray()
+        },target)
+    }
+}
 */
 
-        //[-1,0,3,5,9,12] size:6
-        //9
+    //[-1,0,3,5,9,12] size:6
+    //9
 
 }
