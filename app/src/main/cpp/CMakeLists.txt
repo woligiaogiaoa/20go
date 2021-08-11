@@ -15,6 +15,7 @@ project("a20k")
 # Gradle automatically packages shared libraries with your APK.
 
 include_directories(jni/armeabi-v7a/include)
+include_directories(glm)
 
 set(
         # List variable name

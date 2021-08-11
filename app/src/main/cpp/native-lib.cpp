@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <android/log.h>
+#include "glm/glm.hpp"
 
 extern "C" {
 
@@ -89,6 +90,8 @@ Java_com_aaaaa_a2k_MainActivity_showVideoPreview(JNIEnv *env, jobject thiz, jstr
         //fixme:where
         return static_cast<jboolean>(false);
     }
+
+
 
     AVCodec *codec = nullptr;
     AVCodecParameters *codecParameters = nullptr;
